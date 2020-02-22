@@ -1,6 +1,5 @@
 from django.db import models
-
-import pgcrypto
+from django.contrib.auth.models import User
 
 
 class Category(models.Model):
@@ -26,6 +25,10 @@ class Post(models.Model):
     author_name = models.ForeignKey(User, default="deleted_user", on_delete=models.SET_DEFAULT)
 
 
-class User(models.Model):
-    username = models.CharField(max_length=60)
-    user_password = pgcrypto.EncryptedTextField()
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user_location = models.CharField(max_length=30, blank=True)
+    user_about = models.TextField(max_length=500, blank=True)
+    user_avatar = models.URLField(blank=True)
+    user_posts_amount = models.IntegerField(default=0)
+    user_last_forum_activity_date = models.DateTimeField(blank=True)
