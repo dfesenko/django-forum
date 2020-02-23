@@ -34,7 +34,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     user_location = models.CharField(max_length=30, blank=True)
     user_about = models.TextField(max_length=500, blank=True)
-    user_avatar = models.ImageField(upload_to=user_directory_path, blank=True)
+    user_avatar = models.ImageField(upload_to=user_directory_path, blank=True, default='/default.png')
     user_posts_amount = models.IntegerField(default=0)
     user_last_forum_activity_date = models.DateTimeField(blank=True, null=True)
 
