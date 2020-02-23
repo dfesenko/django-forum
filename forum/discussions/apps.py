@@ -5,4 +5,4 @@ class DiscussionsConfig(AppConfig):
     name = 'discussions'
 
     def ready(self):
-        import forum.discussions.signals
+        from . import signals
