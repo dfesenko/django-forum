@@ -5,6 +5,6 @@ from . import views
 
 app_name = 'discussions'
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+    path('', views.IndexView.as_view(), name='index'),
+    path('users/<int:pk>/', views.DetailView.as_view(), name='detail'),
 ]

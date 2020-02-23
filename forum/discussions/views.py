@@ -5,8 +5,13 @@ from django.views import generic
 from django.contrib.auth.models import User
 
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the forum's index.")
+class IndexView(generic.ListView):
+    template_name = 'discussions/index.html'
+    context_object_name = 'users_list'
+
+    def get_queryset(self):
+        """Return list of registered users"""
+        return User.objects.all()
 
 
 class DetailView(generic.DetailView):
