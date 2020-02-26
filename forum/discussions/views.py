@@ -2,11 +2,13 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.views import generic
 from django.views.generic.base import View
+from django.contrib.auth.views import LoginView
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
+from django.urls import reverse
 
 
 class IndexView(generic.ListView):
@@ -18,12 +20,12 @@ class IndexView(generic.ListView):
         return User.objects.all()
 
 
-class DetailView(generic.DetailView):
+class UserDetailView(generic.DetailView):
     model = User
     template_name = 'discussions/user_profile.html'
 
 
-class SignupView(View):
+class UserSignupView(View):
     def get(self, request, *args, **kwargs):
         form = UserCreationForm()
         return render(request, 'discussions/signup.html', {'form': form})
@@ -39,3 +41,17 @@ class SignupView(View):
             created_user_id = user.pk
             return redirect(f'/users/{created_user_id}/')
 
+
+class UserLoginView(LoginView):
+    template_name = 'discussions/login.html'
+    redirect_field_name = 'detail'
+
+
+class UserPageView(View):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            current_user = request.user
+            current_user_id = current_user.pk
+            return redirect(f'/users/{current_user_id}/')
+        else:
+            reverse('login')
