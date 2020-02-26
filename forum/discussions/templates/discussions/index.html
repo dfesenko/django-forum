@@ -1,5 +1,6 @@
-<a href="{% url 'discussions:login' %}">Login</a> / <a href="{% url 'discussions:signup' %}">Sign up</a>
-<p></p>
+{% extends "discussions/base.html" %}
+
+{% block content %}
 
 {% if users_list %}
     <ul>
@@ -10,3 +11,5 @@
 {% else %}
     <p>There are no users yet.</p>
 {% endif %}
+
+{% endblock %}

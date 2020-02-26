@@ -1,0 +1,14 @@
+<a href="{% url 'discussions:index' %}">Home</a>
+{% if request.user.is_authenticated %}
+    <p>Hello, {{ request.user.username }}! </p>
+    <a href="{% url 'discussions:logout' %}">Logout</a>
+{% else %}
+    <p>
+        <a href="{% url 'discussions:login' %}">Login</a> / <a href="{% url 'discussions:signup' %}">Sign up</a>
+    </p>
+{% endif %}
+
+<p></p>
+
+{% block content %}
+{% endblock %}

@@ -10,4 +10,6 @@ Next steps:
 2) Add email validation via user's mail. - LATER
 
 3) Add Login page (user authorization)
-4) Make user profiles editable for authorized users
+4) Add Logout functionality.
+5) Add base template.
+6) Make user profiles editable for authorized users

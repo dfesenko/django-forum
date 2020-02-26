@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.views.generic.base import View
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -54,4 +54,4 @@ class UserPageView(View):
             current_user_id = current_user.pk
             return redirect(f'/users/{current_user_id}/')
         else:
-            reverse('login')
+            return HttpResponseRedirect(reverse('discussions:login'))
