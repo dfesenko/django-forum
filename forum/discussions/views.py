@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.views.generic.base import View
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, PasswordResetDoneView
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
@@ -28,7 +28,7 @@ class UserDetailView(generic.DetailView):
 class UserSignupView(View):
     def get(self, request, *args, **kwargs):
         form = UserCreationForm()
-        return render(request, 'discussions/signup.html', {'form': form})
+        return render(request, 'registration/signup.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         form = UserCreationForm(request.POST)
@@ -42,11 +42,6 @@ class UserSignupView(View):
             return redirect(f'/users/{created_user_id}/')
 
 
-class UserLoginView(LoginView):
-    template_name = 'discussions/login.html'
-    redirect_field_name = 'detail'
-
-
 class UserPageView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -55,3 +50,8 @@ class UserPageView(View):
             return redirect(f'/users/{current_user_id}/')
         else:
             return HttpResponseRedirect(reverse('discussions:login'))
+
+
+
+
+

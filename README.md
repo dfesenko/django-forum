@@ -12,4 +12,5 @@ Next steps:
 3) Add Login page (user authorization)
 4) Add Logout functionality.
 5) Add base template.
-6) Make user profiles editable for authorized users
+6) Add Password reset functionality.
+7) Make user profiles editable for authorized users
