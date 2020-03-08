@@ -2,13 +2,14 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.views.generic.base import View
-from django.contrib.auth.views import LoginView, PasswordResetDoneView
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import PasswordResetDoneView
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 
 class IndexView(generic.ListView):
@@ -50,6 +51,21 @@ class UserPageView(View):
             return redirect(f'/users/{current_user_id}/')
         else:
             return HttpResponseRedirect(reverse('discussions:login'))
+
+
+class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):
+    login_url = reverse_lazy('discussions:index')
+
+    def test_func(self):
+        prev_page = self.request.META.get('HTTP_REFERER')
+        if prev_page:
+            is_prev_page_was_passw_reset = '/password_reset/' in prev_page
+        else:
+            return False
+
+        allow_access = is_prev_page_was_passw_reset and not self.request.user.is_authenticated
+        return allow_access
+
 
 
 
