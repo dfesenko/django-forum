@@ -11,6 +11,8 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 
+from .forms import UserInfoForm
+
 
 class IndexView(generic.ListView):
     template_name = 'discussions/index.html'
@@ -24,6 +26,20 @@ class IndexView(generic.ListView):
 class UserDetailView(generic.DetailView):
     model = User
     template_name = 'discussions/user_profile.html'
+
+
+class UserPageView(View):
+    """
+    The view for redirecting user to his/her profile page with dynamic url
+    """
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated
+        return allow_access
+
+    def get(self, request, *args, **kwargs):
+        return redirect(f'/users/{request.user.pk}/')
 
 
 class UserSignupView(View):
@@ -43,14 +59,25 @@ class UserSignupView(View):
             return redirect(f'/users/{created_user_id}/')
 
 
-class UserPageView(View):
+class UserPageEditView(UserPassesTestMixin, View):
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated
+        return allow_access
+
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            current_user = request.user
-            current_user_id = current_user.pk
-            return redirect(f'/users/{current_user_id}/')
-        else:
-            return HttpResponseRedirect(reverse('discussions:login'))
+        user_form = UserInfoForm()
+        return render(request, 'discussions/profile_edit.html', {'user_form': user_form})
+
+    def post(self, request, *args, **kwargs):
+        user_instance = get_object_or_404(User, id=request.user.pk)
+        user_form = UserInfoForm(request.POST, instance=user_instance)
+        if user_form.is_valid():
+            not_empty_fields = [k for k, v in user_form.cleaned_data.items() if v]
+            model_instance = user_form.save(commit=False)
+            model_instance.save(update_fields=not_empty_fields)
+            return redirect(f'/users/{request.user.pk}/')
 
 
 class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):

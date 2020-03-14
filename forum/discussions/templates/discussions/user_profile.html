@@ -6,6 +6,14 @@
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
+
+{% if request.user.is_authenticated and request.user.pk == user.pk %}
+
+    <a href="{% url 'discussions:edit_profile' %}">Edit profile</a>
+
+{% endif %}
+
+
 <ul>
     <li>Username: {{ user.username }}</li>
     <li>City: {{ user.profile.user_location }}</li>

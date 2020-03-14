@@ -20,5 +20,6 @@ urlpatterns = [
                                                     success_url=reverse_lazy('discussions:password_reset_complete')),
          name='password_reset_confirm'),
     path('password_reset_complete/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('users/edit_profile/', views.UserPageEditView.as_view(), name='edit_profile'),
     path('userpage/', views.UserPageView.as_view(), name='userpage'),
 ]
