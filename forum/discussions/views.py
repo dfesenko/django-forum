@@ -5,7 +5,7 @@ from django.views.generic.base import View
 
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import PasswordResetDoneView
+from django.contrib.auth.views import PasswordResetDoneView, PasswordChangeDoneView
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
@@ -116,4 +116,18 @@ class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):
             return False
 
         allow_access = is_prev_page_was_passw_reset and not self.request.user.is_authenticated
+        return allow_access
+
+
+class UserPasswordChangeDoneView(UserPassesTestMixin, PasswordChangeDoneView):
+    login_url = reverse_lazy('discussions:index')
+
+    def test_func(self):
+        prev_page = self.request.META.get('HTTP_REFERER')
+        if prev_page:
+            is_prev_page_was_passw_change = '/password_change/' in prev_page
+        else:
+            return False
+
+        allow_access = is_prev_page_was_passw_change and self.request.user.is_authenticated
         return allow_access

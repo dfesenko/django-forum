@@ -9,7 +9,8 @@
 
 {% if request.user.is_authenticated and request.user.pk == user.pk %}
 
-    <a href="{% url 'discussions:edit_profile' %}">Edit profile</a>
+    <a href="{% url 'discussions:edit_profile' %}">Edit profile</a> /
+    <a href="{% url 'discussions:password_change' %}">Change password</a>
 
 {% endif %}
 
