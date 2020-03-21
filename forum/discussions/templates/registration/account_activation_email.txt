@@ -1,0 +1,4 @@
+
+Dear {{ user.username }},
+To finish your registration please click on the link below or copy it to the address bar of the browser:
+http://{{ domain }}{% url 'discussions:activation' uidb64=uid token=token %}

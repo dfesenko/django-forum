@@ -11,7 +11,19 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 
-from .forms import UserInfoForm, ProfileInfoForm
+from django.contrib.sites.shortcuts import get_current_site
+
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from .tokens import account_activation_token
+
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.template.loader import render_to_string
+from django.core.mail import BadHeaderError, send_mail
+from .decorators import async_func
+
+from .forms import UserInfoForm, ProfileInfoForm, SignupForm
 from .models import Profile
 
 
@@ -44,20 +56,71 @@ class UserPageView(View):
 
 
 class UserSignupView(View):
+
+    @async_func
+    def send_async_mail(self, subject, text_message, html_message, from_email, to_email):
+        send_mail(subject=subject, message=text_message, html_message=html_message,
+                  from_email=from_email, recipient_list=[to_email])
+
     def get(self, request, *args, **kwargs):
-        form = UserCreationForm()
+        form = SignupForm()
         return render(request, 'registration/signup.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
-        form = UserCreationForm(request.POST)
+        form = SignupForm(request.POST)
         if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
+            user = form.save(commit=False)
+            user.is_active = False
+            user.save()
+
+            current_site = get_current_site(request)
+            mail_subject = "Activate your forum's account."
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = account_activation_token.make_token(user)
+
+            html_message = render_to_string('registration/account_activation_email.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': uid,
+                'token': token,
+            })
+
+            text_message = render_to_string('registration/account_activation_email.txt', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': uid,
+                'token': token,
+            })
+
+            from_email = 'forum.djangotest@gmail.com'
+            to_email = form.cleaned_data.get('email')
+
+            self.send_async_mail(subject=mail_subject, text_message=text_message, html_message=html_message,
+                                 from_email=from_email, to_email=to_email)
+
+            return render(request, 'registration/email_confirm.html')
+
+        else:
+            return render(request, 'registration/signup.html', {'form': form})
+
+
+class UserActivationView(View):
+
+    def get(self, request, uidb64, token):
+
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, ObjectDoesNotExist):
+            user = None
+
+        if user is not None and account_activation_token.check_token(user, token):
+            user.is_active = True
+            user.save()
             login(request, user)
-            created_user_id = user.pk
-            return redirect(f'/users/{created_user_id}/')
+            return render(request, 'registration/email_confirm_done.html')
+        else:
+            return render(request, 'registration/email_confirm_invalid.html')
 
 
 class UserPageEditView(UserPassesTestMixin, View):

@@ -1,0 +1,7 @@
+
+<h3>Dear {{ user.username }},</h3>
+
+<p>
+    To finish your registration please click on the link below:
+    <a href="http://{{ domain }}{% url 'discussions:activation' uidb64=uid token=token %}"> Activate account </a>
+</p>
