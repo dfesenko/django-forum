@@ -62,7 +62,7 @@ LOGOUT_REDIRECT_URL = '/'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'forum.djangotest'
-EMAIL_HOST_PASSWORD = 'zxcvbbvcxz0'
+EMAIL_HOST_PASSWORD = 'zxcvbbvcxz1'
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'forum.djangotest@gmail.com'
 

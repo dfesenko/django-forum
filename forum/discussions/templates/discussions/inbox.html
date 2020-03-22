@@ -1,0 +1,21 @@
+{% extends "discussions/base.html" %}
+
+{% block content %}
+
+<h1>{{ request.user.username }} - Inbox</h1>
+
+<a href="{% url 'discussions:inbox' pk=request.user.pk %}">Inbox</a> /
+<a href="{% url 'discussions:outbox' pk=request.user.pk %}">Outbox</a>
+
+{% if received_messages_list %}
+    <ul>
+    {% for message in received_messages_list %}
+        <li><a href="{% url 'discussions:message' message_id=message.pk %}">{{ message.subject }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Your inbox is empty.</p>
+{% endif %}
+
+
+{% endblock %}

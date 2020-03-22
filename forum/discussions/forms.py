@@ -1,5 +1,5 @@
-from django.forms import ModelForm, EmailField
-from .models import User, Profile
+from django.forms import ModelForm, EmailField, CharField, Textarea, Select, ChoiceField, ModelChoiceField
+from .models import User, Profile, Message
 
 from django.contrib.auth.forms import UserCreationForm
 
@@ -22,3 +22,13 @@ class SignupForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'email', 'password1', 'password2')
+
+
+class MessageForm(ModelForm):
+    subject = CharField(max_length=100, initial='')
+    msg_content = CharField(widget=Textarea({}), label='Message')
+
+    class Meta:
+        model = Message
+        fields = ('sender', 'receiver', 'subject', 'msg_content')
+

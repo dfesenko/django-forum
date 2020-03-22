@@ -1,0 +1,38 @@
+{% extends "discussions/base.html" %}
+
+{% block content %}
+
+<h1>{{ receiver.username }} - Send message</h1>
+
+<form method="post" action="{% url 'discussions:message_create' pk=receiver.pk %}" >
+
+{% csrf_token %}
+
+<table>
+
+    <tr>
+        <td>{{ message_form.sender.label_tag.as_hidden }}</td>
+        <td>{{ message_form.sender.as_hidden }}</td>
+    </tr>
+
+    <tr>
+        <td>{{ message_form.receiver.label_tag.as_hidden }}</td>
+        <td>{{ message_form.receiver.as_hidden }}</td>
+    </tr>
+
+    <tr>
+        <td>{{ message_form.subject.label_tag }}</td>
+        <td>{{ message_form.subject }}</td>
+    </tr>
+
+    <tr>
+        <td>{{ message_form.msg_content.label_tag }}</td>
+        <td>{{ message_form.msg_content }}</td>
+    </tr>
+</table>
+
+<input type="submit" value="Send">
+
+</form>
+
+{% endblock %}

@@ -23,8 +23,8 @@ from django.template.loader import render_to_string
 from django.core.mail import BadHeaderError, send_mail
 from .decorators import async_func
 
-from .forms import UserInfoForm, ProfileInfoForm, SignupForm
-from .models import Profile
+from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm
+from .models import Profile, Message
 
 
 class IndexView(generic.ListView):
@@ -194,3 +194,76 @@ class UserPasswordChangeDoneView(UserPassesTestMixin, PasswordChangeDoneView):
 
         allow_access = is_prev_page_was_passw_change and self.request.user.is_authenticated
         return allow_access
+
+
+class MessageSentView(UserPassesTestMixin, View):
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated
+        return allow_access
+
+    def get(self, request, pk):
+        receiver = User.objects.get(pk=pk)
+        message_form = MessageForm(initial={'sender': request.user, 'receiver': receiver})
+        return render(request, 'discussions/message_create.html', {'message_form': message_form,
+                                                                   'receiver': receiver})
+
+    def post(self, request, *args, **kwargs):
+        message_form = MessageForm(request.POST)
+        receiver_id = request.POST.get("receiver", "")
+        receiver_instance = get_object_or_404(User, pk=receiver_id)
+
+        if message_form.is_valid():
+            message_form.save()
+
+            return redirect(f'/users/{receiver_id}/')
+
+        return render(request, 'discussions/message_create.html', {'message_form': message_form,
+                                                                   'receiver': receiver_instance})
+
+
+class InboxView(UserPassesTestMixin, generic.ListView):
+    template_name = 'discussions/inbox.html'
+    context_object_name = 'received_messages_list'
+
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated
+        return allow_access
+
+    def get_queryset(self):
+        """Return list of messages in the inbox"""
+        return Message.objects.filter(receiver=self.request.user).order_by('-created_at')
+
+
+class OutboxView(UserPassesTestMixin, generic.ListView):
+    template_name = 'discussions/outbox.html'
+    context_object_name = 'sent_messages_list'
+
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated
+        return allow_access
+
+    def get_queryset(self):
+        """Return list of messages in the inbox"""
+        return Message.objects.filter(sender=self.request.user).order_by('-created_at')
+
+
+class MessageView(UserPassesTestMixin, View):
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated
+        return allow_access
+
+    def get(self, request, message_id):
+        message = get_object_or_404(Message, id=message_id)
+
+        is_from_inbox = 'inbox' in self.request.META.get('HTTP_REFERER')
+
+        return render(request, 'discussions/message.html', {'message': message,
+                                                            'is_from_inbox': is_from_inbox})

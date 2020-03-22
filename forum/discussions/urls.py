@@ -30,4 +30,8 @@ urlpatterns = [
 
     path('users/edit_profile/', views.UserPageEditView.as_view(), name='edit_profile'),
     path('userpage/', views.UserPageView.as_view(), name='userpage'),
+    path('users/<int:pk>/message_create/', views.MessageSentView.as_view(), name='message_create'),
+    path('users/<int:pk>/inbox/', views.InboxView.as_view(), name='inbox'),
+    path('users/<int:pk>/outbox/', views.OutboxView.as_view(), name='outbox'),
+    path('messages/<int:message_id>/', views.MessageView.as_view(), name='message'),
 ]

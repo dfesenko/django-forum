@@ -1,0 +1,24 @@
+{% extends "discussions/base.html" %}
+
+{% block content %}
+
+
+{% if is_from_inbox %}
+<p> Return to <a href="{% url 'discussions:inbox' pk=request.user.pk %}"> Inbox </a> </p>
+{% else %}
+<p> Return to <a href="{% url 'discussions:outbox' pk=request.user.pk %}"> Outbox </a> </p>
+{% endif %}
+
+
+
+<p>From: <i>{{message.sender}}</i></p>
+<p>To: <i>{{message.receiver}}</i></p>
+<p>At: <i>{{message.created_at}}</i></p>
+
+<h3>Subject: {{ message.subject }} </h3>
+
+<p> {{ message.msg_content }} </p>
+
+
+
+{% endblock %}
