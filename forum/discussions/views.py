@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.views import generic
 from django.views.generic.base import View
 
@@ -24,7 +24,7 @@ from django.core.mail import BadHeaderError, send_mail
 from .decorators import async_func
 
 from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm
-from .models import Profile, Message
+from .models import Profile, Message, DeletedMessage
 
 
 class IndexView(generic.ListView):
@@ -230,12 +230,14 @@ class InboxView(UserPassesTestMixin, generic.ListView):
     login_url = reverse_lazy('discussions:login')
 
     def test_func(self):
-        allow_access = self.request.user.is_authenticated
+        allow_access = self.request.user.is_authenticated and (self.request.user.pk == int(self.kwargs['pk']))
         return allow_access
 
     def get_queryset(self):
         """Return list of messages in the inbox"""
-        return Message.objects.filter(receiver=self.request.user).order_by('-created_at')
+        deleted_messages = DeletedMessage.objects.filter(user=self.request.user).values_list('message', flat=True)
+        return Message.objects.filter(receiver=self.request.user).order_by('-created_at').exclude(pk__in=
+                                                                                                  deleted_messages)
 
 
 class OutboxView(UserPassesTestMixin, generic.ListView):
@@ -245,15 +247,45 @@ class OutboxView(UserPassesTestMixin, generic.ListView):
     login_url = reverse_lazy('discussions:login')
 
     def test_func(self):
-        allow_access = self.request.user.is_authenticated
+        allow_access = self.request.user.is_authenticated and self.request.user.pk == int(self.kwargs['pk'])
         return allow_access
 
     def get_queryset(self):
-        """Return list of messages in the inbox"""
-        return Message.objects.filter(sender=self.request.user).order_by('-created_at')
+        """Return list of messages in the outbox"""
+        deleted_messages = DeletedMessage.objects.filter(user=self.request.user).values_list('message', flat=True)
+        return Message.objects.filter(sender=self.request.user).order_by('-created_at').exclude(pk__in=
+                                                                                                deleted_messages)
 
 
 class MessageView(UserPassesTestMixin, View):
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        message = Message.objects.get(pk=int(self.kwargs['message_id']))
+
+        is_sender = self.request.user == message.sender
+        is_receiver = self.request.user == message.receiver
+
+        allow_access = self.request.user.is_authenticated and (is_receiver or is_sender)
+        return allow_access
+
+    def get(self, request, message_id):
+        message = get_object_or_404(Message, id=message_id)
+
+        is_from_bucket = 'bucket' in self.request.META.get('HTTP_REFERER')
+
+        try:
+            DeletedMessage.objects.get(user=request.user, message=message)
+            is_deleted = True
+        except ObjectDoesNotExist:
+            is_deleted = False
+
+        return render(request, 'discussions/message.html', {'message': message,
+                                                            'is_from_bucket': is_from_bucket,
+                                                            'is_deleted': is_deleted})
+
+
+class DeleteMessageView(UserPassesTestMixin, View):
     login_url = reverse_lazy('discussions:login')
 
     def test_func(self):
@@ -263,7 +295,84 @@ class MessageView(UserPassesTestMixin, View):
     def get(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
 
-        is_from_inbox = 'inbox' in self.request.META.get('HTTP_REFERER')
+        is_sender = request.user == message.sender
+        is_receiver = request.user == message.receiver
 
-        return render(request, 'discussions/message.html', {'message': message,
-                                                            'is_from_inbox': is_from_inbox})
+        # only sender or receiver can delete their own messages
+        if any([is_sender, is_receiver]):
+
+            # detect if the message is already in bucket or in inbox/outbox
+            try:
+                deleted_message = DeletedMessage.objects.get(user=request.user, message=message)
+                is_in_bucket = True
+            except ObjectDoesNotExist:
+                is_in_bucket = False
+
+            if is_in_bucket:
+                # get the recipient if the current user is sender and the sender if the current user is recipient
+                other_user = message.receiver if is_sender else message.sender
+
+                # check if the message is already deleted by the other user
+                try:
+                    is_deleted_by_other_user = DeletedMessage.objects.get(user=other_user, message=message)
+                except ObjectDoesNotExist:
+                    is_deleted_by_other_user = False
+
+                if is_deleted_by_other_user and is_deleted_by_other_user.is_deleted_permanently:
+                    # delete message from Messages if the other user is already deleted it even from his/her bucket
+                    message.delete()
+                else:
+                    # if the messages is in bucket, inbox, or outbox of the other user, then just set
+                    # the is_deleted_permanently flag to True for the current user
+                    # the message will not be shown in the current user's bucket from this moment
+                    deleted_message.is_deleted_permanently = True
+                    deleted_message.save()
+
+                return redirect('discussions:bucket', pk=request.user.pk)
+
+            else:
+                # if the message was not in bucket, move it there (by creating the corresponding DeletedMessage object)
+                deleted_message = DeletedMessage(user=request.user, message=message)
+                deleted_message.save()
+
+            return redirect('discussions:inbox', pk=request.user.pk) if is_receiver else redirect('discussions:outbox',
+                                                                                                  pk=request.user.pk)
+        return Http404('The page does not exist')
+
+
+class RestoreMessageView(UserPassesTestMixin, View):
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated
+        return allow_access
+
+    def get(self, request, message_id):
+        message = get_object_or_404(Message, id=message_id)
+
+        is_sender = request.user == message.sender
+        is_receiver = request.user == message.receiver
+
+        # only sender or receiver can restore their own messages
+        if any([is_sender, is_receiver]):
+            DeletedMessage.objects.get(user=request.user, message=message).delete()
+            return redirect('discussions:bucket', pk=request.user.pk)
+
+        return Http404('The page does not exist')
+
+
+class BucketView(UserPassesTestMixin, generic.ListView):
+    template_name = 'discussions/deleted_messages.html'
+    context_object_name = 'deleted_messages_list'
+
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated and self.request.user.pk == int(self.kwargs['pk'])
+        return allow_access
+
+    def get_queryset(self):
+        """Return list of deleted messages"""
+        deleted_messages = DeletedMessage.objects.filter(user=self.request.user).exclude(is_deleted_permanently=True).\
+            values_list('message', flat=True)
+        return Message.objects.filter(pk__in=deleted_messages).order_by('-created_at')

@@ -17,7 +17,7 @@ class ProfileInfoForm(ModelForm):
 
 
 class SignupForm(UserCreationForm):
-    email = EmailField(max_length=200, help_text='Required')
+    email = EmailField(max_length=200, help_text='Required', required=True)
 
     class Meta:
         model = User

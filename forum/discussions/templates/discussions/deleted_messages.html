@@ -2,20 +2,20 @@
 
 {% block content %}
 
-<h1>{{ request.user.username }} - Inbox</h1>
+<h1>{{ request.user.username }} - Deleted messages</h1>
 
 <a href="{% url 'discussions:inbox' pk=request.user.pk %}">Inbox</a> /
 <a href="{% url 'discussions:outbox' pk=request.user.pk %}">Outbox</a> /
 <a href="{% url 'discussions:bucket' pk=request.user.pk %}">Bucket</a>
 
-{% if received_messages_list %}
+{% if deleted_messages_list %}
     <ul>
-    {% for message in received_messages_list %}
+    {% for message in deleted_messages_list %}
         <li><a href="{% url 'discussions:message' message_id=message.pk %}">{{ message.subject }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
-    <p>Your inbox is empty.</p>
+    <p>Your bucket is empty.</p>
 {% endif %}
 
 

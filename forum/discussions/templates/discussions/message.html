@@ -3,7 +3,9 @@
 {% block content %}
 
 
-{% if is_from_inbox %}
+{% if is_from_bucket %}
+<p> Return to <a href="{% url 'discussions:bucket' pk=request.user.pk %}"> Bucket </a> </p>
+{% elif request.user == message.receiver%}
 <p> Return to <a href="{% url 'discussions:inbox' pk=request.user.pk %}"> Inbox </a> </p>
 {% else %}
 <p> Return to <a href="{% url 'discussions:outbox' pk=request.user.pk %}"> Outbox </a> </p>
@@ -19,6 +21,12 @@
 
 <p> {{ message.msg_content }} </p>
 
+{% if is_deleted %}
+<a href="{% url 'discussions:delete_message' message_id=message.pk %}">Delete permanently</a> /
+<a href="{% url 'discussions:restore_message' message_id=message.pk %}"> Restore </a>
+{% else %}
+<a href="{% url 'discussions:delete_message' message_id=message.pk %}">Delete message</a>
+{% endif %}
 
 
 {% endblock %}
