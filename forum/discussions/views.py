@@ -20,7 +20,7 @@ from .tokens import account_activation_token
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.template.loader import render_to_string
-from django.core.mail import BadHeaderError, send_mail
+from django.core.mail import send_mail
 from .decorators import async_func
 
 from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm
@@ -41,16 +41,26 @@ class UserDetailView(generic.DetailView):
     template_name = 'discussions/user_profile.html'
 
 
-class UserPageView(View):
-    """
-    The view for redirecting user to his/her profile page with dynamic url
-    """
+class CheckUserMixin(UserPassesTestMixin):
     login_url = reverse_lazy('discussions:login')
 
     def test_func(self):
         allow_access = self.request.user.is_authenticated
         return allow_access
 
+
+class CheckMailboxUserMixin(CheckUserMixin):
+    login_url = reverse_lazy('discussions:login')
+
+    def test_func(self):
+        allow_access = self.request.user.is_authenticated and self.request.user.pk == int(self.kwargs['pk'])
+        return allow_access
+
+
+class UserPageView(CheckUserMixin, View):
+    """
+    The view for redirecting user to his/her profile page with dynamic url
+    """
     def get(self, request, *args, **kwargs):
         return redirect(f'/users/{request.user.pk}/')
 
@@ -123,12 +133,7 @@ class UserActivationView(View):
             return render(request, 'registration/email_confirm_invalid.html')
 
 
-class UserPageEditView(UserPassesTestMixin, View):
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated
-        return allow_access
+class UserPageEditView(CheckUserMixin, View):
 
     def get(self, request, *args, **kwargs):
         user_instance = get_object_or_404(User, id=request.user.pk)
@@ -196,12 +201,7 @@ class UserPasswordChangeDoneView(UserPassesTestMixin, PasswordChangeDoneView):
         return allow_access
 
 
-class MessageSentView(UserPassesTestMixin, View):
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated
-        return allow_access
+class MessageSentView(CheckUserMixin, View):
 
     def get(self, request, pk):
         receiver = User.objects.get(pk=pk)
@@ -223,15 +223,9 @@ class MessageSentView(UserPassesTestMixin, View):
                                                                    'receiver': receiver_instance})
 
 
-class InboxView(UserPassesTestMixin, generic.ListView):
+class InboxView(CheckMailboxUserMixin, generic.ListView):
     template_name = 'discussions/inbox.html'
     context_object_name = 'received_messages_list'
-
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated and (self.request.user.pk == int(self.kwargs['pk']))
-        return allow_access
 
     def get_queryset(self):
         """Return list of messages in the inbox"""
@@ -240,21 +234,26 @@ class InboxView(UserPassesTestMixin, generic.ListView):
                                                                                                   deleted_messages)
 
 
-class OutboxView(UserPassesTestMixin, generic.ListView):
+class OutboxView(CheckMailboxUserMixin, generic.ListView):
     template_name = 'discussions/outbox.html'
     context_object_name = 'sent_messages_list'
-
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated and self.request.user.pk == int(self.kwargs['pk'])
-        return allow_access
 
     def get_queryset(self):
         """Return list of messages in the outbox"""
         deleted_messages = DeletedMessage.objects.filter(user=self.request.user).values_list('message', flat=True)
         return Message.objects.filter(sender=self.request.user).order_by('-created_at').exclude(pk__in=
                                                                                                 deleted_messages)
+
+
+class BucketView(CheckMailboxUserMixin, generic.ListView):
+    template_name = 'discussions/deleted_messages.html'
+    context_object_name = 'deleted_messages_list'
+
+    def get_queryset(self):
+        """Return list of deleted messages"""
+        deleted_messages = DeletedMessage.objects.filter(user=self.request.user).exclude(is_deleted_permanently=True).\
+            values_list('message', flat=True)
+        return Message.objects.filter(pk__in=deleted_messages).order_by('-created_at')
 
 
 class MessageView(UserPassesTestMixin, View):
@@ -272,7 +271,11 @@ class MessageView(UserPassesTestMixin, View):
     def get(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
 
-        is_from_bucket = 'bucket' in self.request.META.get('HTTP_REFERER')
+        try:
+            is_from_bucket = 'bucket' in self.request.META.get('HTTP_REFERER')
+        except TypeError as e:
+            if "argument of type 'NoneType' is not iterable" in str(e):
+                is_from_bucket = False
 
         try:
             DeletedMessage.objects.get(user=request.user, message=message)
@@ -285,12 +288,7 @@ class MessageView(UserPassesTestMixin, View):
                                                             'is_deleted': is_deleted})
 
 
-class DeleteMessageView(UserPassesTestMixin, View):
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated
-        return allow_access
+class DeleteMessageView(CheckUserMixin, View):
 
     def get(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
@@ -340,12 +338,7 @@ class DeleteMessageView(UserPassesTestMixin, View):
         return Http404('The page does not exist')
 
 
-class RestoreMessageView(UserPassesTestMixin, View):
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated
-        return allow_access
+class RestoreMessageView(CheckUserMixin, View):
 
     def get(self, request, message_id):
         message = get_object_or_404(Message, id=message_id)
@@ -360,19 +353,3 @@ class RestoreMessageView(UserPassesTestMixin, View):
 
         return Http404('The page does not exist')
 
-
-class BucketView(UserPassesTestMixin, generic.ListView):
-    template_name = 'discussions/deleted_messages.html'
-    context_object_name = 'deleted_messages_list'
-
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated and self.request.user.pk == int(self.kwargs['pk'])
-        return allow_access
-
-    def get_queryset(self):
-        """Return list of deleted messages"""
-        deleted_messages = DeletedMessage.objects.filter(user=self.request.user).exclude(is_deleted_permanently=True).\
-            values_list('message', flat=True)
-        return Message.objects.filter(pk__in=deleted_messages).order_by('-created_at')
