@@ -24,7 +24,7 @@ from django.core.mail import send_mail
 from .decorators import async_func
 
 from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm
-from .models import Profile, Message, DeletedMessage
+from .models import Profile, Message, DeletedMessage, ReadMessages
 
 
 class IndexView(generic.ListView):
@@ -50,7 +50,6 @@ class CheckUserMixin(UserPassesTestMixin):
 
 
 class CheckMailboxUserMixin(CheckUserMixin):
-    login_url = reverse_lazy('discussions:login')
 
     def test_func(self):
         allow_access = self.request.user.is_authenticated and self.request.user.pk == int(self.kwargs['pk'])
@@ -61,6 +60,7 @@ class UserPageView(CheckUserMixin, View):
     """
     The view for redirecting user to his/her profile page with dynamic url
     """
+
     def get(self, request, *args, **kwargs):
         return redirect(f'/users/{request.user.pk}/')
 
@@ -230,8 +230,20 @@ class InboxView(CheckMailboxUserMixin, generic.ListView):
     def get_queryset(self):
         """Return list of messages in the inbox"""
         deleted_messages = DeletedMessage.objects.filter(user=self.request.user).values_list('message', flat=True)
-        return Message.objects.filter(receiver=self.request.user).order_by('-created_at').exclude(pk__in=
-                                                                                                  deleted_messages)
+
+        messages_list = Message.objects.filter(receiver=self.request.user).\
+            order_by('-created_at').exclude(pk__in=deleted_messages)
+
+        is_read_list = []
+        for message in messages_list:
+            # get read status for each message in messages_list.
+            # ReadMessages table store only already read messages by users.
+            is_read = ReadMessages.objects.filter(user=self.request.user.pk, message=message)
+            is_read_list.append(True if is_read else False)
+
+        messages_with_read_statuses = [[message, status] for message, status in zip(messages_list, is_read_list)]
+
+        return messages_with_read_statuses
 
 
 class OutboxView(CheckMailboxUserMixin, generic.ListView):
@@ -239,10 +251,22 @@ class OutboxView(CheckMailboxUserMixin, generic.ListView):
     context_object_name = 'sent_messages_list'
 
     def get_queryset(self):
-        """Return list of messages in the outbox"""
+        """Return list of messages in the inbox"""
         deleted_messages = DeletedMessage.objects.filter(user=self.request.user).values_list('message', flat=True)
-        return Message.objects.filter(sender=self.request.user).order_by('-created_at').exclude(pk__in=
-                                                                                                deleted_messages)
+
+        messages_list = Message.objects.filter(sender=self.request.user). \
+            order_by('-created_at').exclude(pk__in=deleted_messages)
+
+        is_read_list = []
+        for message in messages_list:
+            # get read status for each message in messages_list.
+            # ReadMessages table store only already read messages by users.
+            is_read = ReadMessages.objects.filter(user=self.request.user.pk, message=message)
+            is_read_list.append(True if is_read else False)
+
+        messages_with_read_statuses = [[message, status] for message, status in zip(messages_list, is_read_list)]
+
+        return messages_with_read_statuses
 
 
 class BucketView(CheckMailboxUserMixin, generic.ListView):
@@ -251,9 +275,21 @@ class BucketView(CheckMailboxUserMixin, generic.ListView):
 
     def get_queryset(self):
         """Return list of deleted messages"""
-        deleted_messages = DeletedMessage.objects.filter(user=self.request.user).exclude(is_deleted_permanently=True).\
+        deleted_messages = DeletedMessage.objects.filter(user=self.request.user).exclude(is_deleted_permanently=True). \
             values_list('message', flat=True)
-        return Message.objects.filter(pk__in=deleted_messages).order_by('-created_at')
+
+        messages_list = Message.objects.filter(pk__in=deleted_messages).order_by('-created_at')
+
+        is_read_list = []
+        for message in messages_list:
+            # get read status for each message in messages_list.
+            # ReadMessages table store only already read messages by users.
+            is_read = ReadMessages.objects.filter(user=self.request.user.pk, message=message)
+            is_read_list.append(True if is_read else False)
+
+        messages_with_read_statuses = [[message, status] for message, status in zip(messages_list, is_read_list)]
+
+        return messages_with_read_statuses
 
 
 class MessageView(UserPassesTestMixin, View):
@@ -283,9 +319,12 @@ class MessageView(UserPassesTestMixin, View):
         except ObjectDoesNotExist:
             is_deleted = False
 
+        is_read = ReadMessages.objects.filter(user=request.user.pk, message=message)
+
         return render(request, 'discussions/message.html', {'message': message,
                                                             'is_from_bucket': is_from_bucket,
-                                                            'is_deleted': is_deleted})
+                                                            'is_deleted': is_deleted,
+                                                            'is_read': is_read})
 
 
 class DeleteMessageView(CheckUserMixin, View):
@@ -353,3 +392,21 @@ class RestoreMessageView(CheckUserMixin, View):
 
         return Http404('The page does not exist')
 
+
+class ReadMessageView(CheckUserMixin, View):
+
+    def get(self, request, message_id, read_action):
+        user_instance = get_object_or_404(User, id=request.user.pk)
+        message_instance = get_object_or_404(Message, id=message_id)
+
+        if read_action == 'as_read':
+            # adding the record to the ReadMessages table means that the given user has read the given message
+            read_message = ReadMessages(user=user_instance, message=message_instance)
+            read_message.save()
+        else:
+            # if there is no user-message pair in ReadMessages table - the given user hasn't read the given message yet
+            read_message = get_object_or_404(ReadMessages, user=user_instance, message=message_instance)
+            read_message.delete()
+
+        # reload the current page (from which this view was called)
+        return redirect(self.request.META.get('HTTP_REFERER'))

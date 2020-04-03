@@ -40,4 +40,5 @@ urlpatterns = [
     path('messages/<int:message_id>/', views.MessageView.as_view(), name='message'),
     path('messages/<int:message_id>/delete/', views.DeleteMessageView.as_view(), name='delete_message'),
     path('messages/<int:message_id>/restore/', views.RestoreMessageView.as_view(), name='restore_message'),
+    path('messages/<int:message_id>/<slug:read_action>/', views.ReadMessageView.as_view(), name='read_unread'),
 ]
