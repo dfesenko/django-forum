@@ -24,16 +24,15 @@ from django.core.mail import send_mail
 from .decorators import async_func
 
 from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm
-from .models import Profile, Message, DeletedMessage, ReadMessages
+from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post
 
 
 class IndexView(generic.ListView):
     template_name = 'discussions/index.html'
-    context_object_name = 'users_list'
+    context_object_name = 'queryset_list'
 
     def get_queryset(self):
-        """Return list of registered users"""
-        return User.objects.all()
+        return {'users': User.objects.all(), 'categories': Category.objects.all()}
 
 
 class UserDetailView(generic.DetailView):
@@ -410,3 +409,19 @@ class ReadMessageView(CheckUserMixin, View):
 
         # reload the current page (from which this view was called)
         return redirect(self.request.META.get('HTTP_REFERER'))
+
+
+class CategoryView(generic.ListView):
+    template_name = 'discussions/category.html'
+    context_object_name = 'topics_list'
+
+    def get_queryset(self):
+        return Topic.objects.filter(category_id=self.kwargs['category_id'])
+
+
+class TopicView(generic.ListView):
+    template_name = 'discussions/topic.html'
+    context_object_name = 'posts_list'
+
+    def get_queryset(self):
+        return Post.objects.filter(topic_id=self.kwargs['topic_id'])

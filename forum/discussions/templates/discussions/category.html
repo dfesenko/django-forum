@@ -1,0 +1,17 @@
+{% extends "discussions/base.html" %}
+
+{% block content %}
+
+{% if topics_list %}
+<p>Topics:</p>
+    <ul>
+    {% for topic in topics_list %}
+        <li><a href="{% url 'discussions:topic' topic_id=topic.pk %}">{{ topic.topic_title }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>There are no topics yet.</p>
+{% endif %}
+
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "discussions/base.html" %}
+
+{% block content %}
+
+{% if posts_list %}
+<p>Posts:</p>
+    <ul>
+    {% for post in posts_list %}
+        <li>
+            <p>Author: {{ post.author.username }}</p>
+            <img src="{{ post.author.profile.user_avatar.url }}" width="35" height="50">
+            <p>Date: {{ post.creation_date }}</p>
+            <p>{{ post.post_body }}</p>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>There are no posts yet.</p>
+{% endif %}
+
+
+{% endblock %}
