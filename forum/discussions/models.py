@@ -12,7 +12,7 @@ class Category(models.Model):
 
 
 class Topic(models.Model):
-    category_id = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="topics")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="topics")
     creation_date = models.DateTimeField(auto_now_add=True)
     last_updated_date = models.DateTimeField(auto_now=True)
     topic_title = models.CharField(max_length=300)
@@ -25,7 +25,7 @@ class Topic(models.Model):
 
 
 class Post(models.Model):
-    topic_id = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="posts")
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="posts")
     creation_date = models.DateTimeField(auto_now_add=True)
     post_body = models.TextField()
     votes = models.IntegerField(default=0)
