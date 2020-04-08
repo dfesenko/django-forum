@@ -9,8 +9,8 @@ app_name = 'discussions'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('users/<int:pk>/', views.UserDetailView.as_view(), name='detail'),
-
     path('signup/', views.UserSignupView.as_view(), name='signup'),
+    path('email_confirm/', views.EmailConfirmView.as_view(), name='email_confirm'),
     path('account_activation/<uidb64>/<token>/', views.UserActivationView.as_view(), name='activation'),
 
     path('login/', LoginView.as_view(), name='login'),

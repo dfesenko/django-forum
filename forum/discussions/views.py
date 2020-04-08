@@ -107,10 +107,14 @@ class UserSignupView(View):
             self.send_async_mail(subject=mail_subject, text_message=text_message, html_message=html_message,
                                  from_email=from_email, to_email=to_email)
 
-            return render(request, 'registration/email_confirm.html')
-
+            return redirect('discussions:email_confirm')
         else:
             return render(request, 'registration/signup.html', {'form': form})
+
+
+class EmailConfirmView(View):
+    def get(self, request):
+        return render(request, 'registration/email_confirm.html')
 
 
 class UserActivationView(View):
@@ -169,7 +173,7 @@ class UserPageEditView(CheckUserMixin, View):
             profile_model_instance = profile_form.save(commit=False)
             profile_model_instance.save(update_fields=not_empty_fields_profile)
 
-            return redirect(f'/users/{request.user.pk}/')
+            return redirect('discussions:detail', pk=request.user.pk)
 
 
 class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):
@@ -216,7 +220,7 @@ class MessageSentView(CheckUserMixin, View):
         if message_form.is_valid():
             message_form.save()
 
-            return redirect(f'/users/{receiver_id}/')
+            return redirect('discussions:detail', pk=receiver_id)
 
         return render(request, 'discussions/message_create.html', {'message_form': message_form,
                                                                    'receiver': receiver_instance})
