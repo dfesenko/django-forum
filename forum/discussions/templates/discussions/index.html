@@ -2,27 +2,15 @@
 
 {% block content %}
 
-{% if queryset_list.users %}
+{% if users_list %}
 <p>Users:</p>
     <ul>
-    {% for user in queryset_list.users %}
+    {% for user in users_list %}
         <li><a href="/users/{{ user.id }}/">{{ user.username }}</a></li>
     {% endfor %}
     </ul>
 {% else %}
     <p>There are no users yet.</p>
-{% endif %}
-
-
-{% if queryset_list.categories %}
-<p>Categories:</p>
-    <ul>
-    {% for category in queryset_list.categories %}
-        <li><a href="{% url 'discussions:category' category_id=category.pk %}">{{ category.category_name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>There are no categories yet.</p>
 {% endif %}
 
 

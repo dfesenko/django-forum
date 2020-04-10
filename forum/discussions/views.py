@@ -29,10 +29,18 @@ from .models import Profile, Message, DeletedMessage, ReadMessages, Category, To
 
 class IndexView(generic.ListView):
     template_name = 'discussions/index.html'
-    context_object_name = 'queryset_list'
+    context_object_name = 'users_list'
 
     def get_queryset(self):
-        return {'users': User.objects.all(), 'categories': Category.objects.all()}
+        return User.objects.all()
+
+
+class ForumView(generic.ListView):
+    template_name = 'discussions/forum.html'
+    context_object_name = 'categories_list'
+
+    def get_queryset(self):
+        return Category.objects.all()
 
 
 class UserDetailView(generic.DetailView):
