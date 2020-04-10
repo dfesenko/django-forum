@@ -42,6 +42,7 @@ urlpatterns = [
     path('messages/<int:message_id>/restore/', views.RestoreMessageView.as_view(), name='restore_message'),
     path('messages/<int:message_id>/<slug:read_action>/', views.ReadMessageView.as_view(), name='read_unread'),
     path('forums/', views.ForumView.as_view(), name='forum'),
+    path('forums/new/', views.CreateTopicView.as_view(), name='new_topic'),
     path('forums/<int:category_id>/', views.CategoryView.as_view(), name='category'),
     path('forums/topic/<int:topic_id>/', views.TopicView.as_view(), name='topic'),
 ]

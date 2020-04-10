@@ -1,0 +1,34 @@
+{% extends "discussions/base.html" %}
+
+{% block content %}
+
+<h1>New topic</h1>
+
+<form method="post" action="{% url 'discussions:new_topic'%}" >
+
+{% csrf_token %}
+
+<table>
+
+    <tr>
+        <td>{{ topic_form.topic_title.label_tag }}</td>
+        <td>{{ topic_form.topic_title}}</td>
+    </tr>
+
+    <tr>
+        <td>{{ topic_form.category.label_tag }}</td>
+        <td>{{ topic_form.category }}</td>
+    </tr>
+
+    <tr>
+        <td>{{ post_form.post_body.label_tag }}</td>
+        <td>{{ post_form.post_body }}</td>
+    </tr>
+
+</table>
+
+<input type="submit" value="Add">
+
+</form>
+
+{% endblock %}

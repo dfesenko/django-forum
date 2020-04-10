@@ -23,7 +23,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from .decorators import async_func
 
-from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm
+from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm, TopicForm, PostForm
 from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post
 
 
@@ -437,3 +437,30 @@ class TopicView(generic.ListView):
 
     def get_queryset(self):
         return Post.objects.filter(topic_id=self.kwargs['topic_id'])
+
+
+class CreateTopicView(CheckUserMixin, View):
+    def get(self, request):
+        topic_form = TopicForm()
+        post_form = PostForm()
+        return render(request, 'discussions/topic_create.html', {'topic_form': topic_form,
+                                                                 'post_form': post_form})
+
+    def post(self, request, *args, **kwargs):
+        topic_form = TopicForm(request.POST)
+        post_form = PostForm(request.POST)
+
+        if topic_form.is_valid() and post_form.is_valid():
+            topic = topic_form.save(commit=False)
+            topic.last_active_user = request.user
+            topic.save()
+
+            post = post_form.save(commit=False)
+            post.author = request.user
+            post.topic = topic
+            post.save()
+
+            return redirect('discussions:forum')
+
+        return render(request, 'discussions/message_create.html', {'topic_form': topic_form,
+                                                                   'post_form': post_form})

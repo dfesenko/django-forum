@@ -1,5 +1,5 @@
 from django.forms import ModelForm, EmailField, CharField, Textarea, Select, ChoiceField, ModelChoiceField
-from .models import User, Profile, Message
+from .models import User, Profile, Message, Topic, Post
 
 from django.contrib.auth.forms import UserCreationForm
 
@@ -31,4 +31,20 @@ class MessageForm(ModelForm):
     class Meta:
         model = Message
         fields = ('sender', 'receiver', 'subject', 'msg_content')
+
+
+class TopicForm(ModelForm):
+    topic_title = CharField(label='Title')
+
+    class Meta:
+        model = Topic
+        fields = ('topic_title', 'category')
+
+
+class PostForm(ModelForm):
+    post_body = CharField(widget=Textarea({}), label='Text')
+
+    class Meta:
+        model = Post
+        fields = ('post_body',)
 

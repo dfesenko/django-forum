@@ -2,6 +2,11 @@
 
 {% block content %}
 
+
+<p>
+    <a href="{% url 'discussions:new_topic' %}">Create new topic</a>
+</p>
+
 {% if categories_list %}
 <p>Categories:</p>
     <ul>
