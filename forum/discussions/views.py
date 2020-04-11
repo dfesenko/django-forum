@@ -431,12 +431,31 @@ class CategoryView(generic.ListView):
         return Topic.objects.filter(category_id=self.kwargs['category_id'])
 
 
-class TopicView(generic.ListView):
-    template_name = 'discussions/topic.html'
-    context_object_name = 'posts_list'
+class TopicView(View):
+    # todo: refactor this using FormView
 
-    def get_queryset(self):
-        return Post.objects.filter(topic_id=self.kwargs['topic_id'])
+    def get(self, request, topic_id):
+        return self.post_list_response(request, PostForm())
+
+    def post(self, request, topic_id):
+        post_form = PostForm(request.POST)
+        if post_form.is_valid():
+            post = post_form.save(commit=False)
+            post.author = request.user
+            post.topic = Topic.objects.get(pk=topic_id)
+            post.save()
+            return redirect('discussions:topic', topic_id=topic_id)
+
+        return self.post_list_response(request, post_form)
+
+    def post_list_response(self, request, post_form):
+        topic_id = self.kwargs['topic_id']
+        posts_list = Post.objects.filter(topic_id=topic_id).order_by('-creation_date')
+        return render(request, 'discussions/topic.html', {
+            'posts_list': posts_list,
+            'post_form': post_form,
+            'topic_id': topic_id
+        })
 
 
 class CreateTopicView(CheckUserMixin, View):

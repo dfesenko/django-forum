@@ -2,6 +2,20 @@
 
 {% block content %}
 
+{% if not request.user.is_anonymous %}
+    <form method="post" action="{% url 'discussions:topic' topic_id=topic_id %}" >
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td>{{ post_form.post_body.label_tag }}</td>
+                <td>{{ post_form.post_body }}</td>
+            </tr>
+        </table>
+        <input type="submit" value="Add post">
+    </form>
+{% endif %}
+
+
 {% if posts_list %}
 <p>Posts:</p>
     <ul>
@@ -17,6 +31,5 @@
 {% else %}
     <p>There are no posts yet.</p>
 {% endif %}
-
 
 {% endblock %}
