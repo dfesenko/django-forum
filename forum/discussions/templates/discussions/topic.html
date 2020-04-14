@@ -1,5 +1,33 @@
 {% extends "discussions/base.html" %}
 
+{% block javascript %}
+  <script>
+    $(".vote").on("click", function () {
+      el = $(this)
+
+      var elContent = el.text();
+      var postId = el.val();
+
+      var direction = (elContent == "Like") ? "up" : "down";
+      var changeTextTo = (elContent == "Like") ? "Dislike" : "Like";
+
+      $.ajax({
+        url: '/post/vote/' + postId + '/' + direction + '/',
+        dataType: 'json',
+        success: function (data) {
+          if (data.prev_vote == 0) {
+            el.hide();
+          } else {
+            $("#" + postId + " .vote:hidden").show();
+          }
+
+          $('li#' + postId + ' span').text(data.votes)
+        }
+      });
+    });
+  </script>
+{% endblock %}
+
 {% block content %}
 
 {% if not request.user.is_anonymous %}
@@ -16,15 +44,29 @@
 {% endif %}
 
 
-{% if posts_list %}
+{% if posts_and_votes_list %}
 <p>Posts:</p>
     <ul>
-    {% for post in posts_list %}
-        <li>
-            <p>Author: {{ post.author.username }}</p>
-            <img src="{{ post.author.profile.user_avatar.url }}" width="35" height="50">
-            <p>Date: {{ post.creation_date }}</p>
-            <p>{{ post.post_body }}</p>
+    {% for post in posts_and_votes_list %}
+        <li id="{{ post.0.pk }}">
+            <p>Author: {{ post.0.author.username }}</p>
+            <img src="{{ post.0.author.profile.user_avatar.url }}" width="35" height="50">
+            <p>Date: {{ post.0.creation_date }}</p>
+            <p>{{ post.0.post_body }}</p>
+            <p>Votes: <span>{{ post.0.votes }}</span></p>
+
+            {% if not request.user.is_anonymous %}
+                {% if post.1 == 0 %}
+                    <button class='vote' value="{{ post.0.pk }}">Like</button>
+                    <button class='vote' value="{{ post.0.pk }}">Dislike</button>
+                {% elif post.1 == 1 %}
+                    <button class='vote' value="{{ post.0.pk }}" style="display: none;">Like</button>
+                    <button class='vote' value="{{ post.0.pk }}">Dislike</button>
+                {% else %}
+                    <button class='vote' value="{{ post.0.pk }}">Like</button>
+                    <button class='vote' value="{{ post.0.pk }}" style="display: none;">Dislike</button>
+                {% endif %}
+            {% endif %}
         </li>
     {% endfor %}
     </ul>

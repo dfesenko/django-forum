@@ -28,11 +28,19 @@ class Post(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name="posts")
     creation_date = models.DateTimeField(auto_now_add=True)
     post_body = models.TextField()
-    votes = models.IntegerField(default=0)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="author_of_posts", null=True)
 
     def __str__(self):
         return self.author.username + " -> " + str(self.pk)
+
+    def votes(self):
+        return sum(PostVotes.objects.filter(post=self).values_list('vote_value', flat=True))
+
+
+class PostVotes(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_votes")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="post_votes")
+    vote_value = models.IntegerField()
 
 
 def user_directory_path(instance, filename):

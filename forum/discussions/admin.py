@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post
+from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post, PostVotes
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -11,10 +11,19 @@ class TopicAdmin(admin.ModelAdmin):
     list_display = ('topic_title', 'category', 'posts_amount', 'last_updated_date', 'last_active_user')
 
 
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'topic', 'votes', 'author')
+
+
+class PostVotesAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post', 'vote_value')
+
+
 admin.site.register(Profile)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Topic, TopicAdmin)
-admin.site.register(Post)
+admin.site.register(Post, PostAdmin)
 admin.site.register(Message)
 admin.site.register(DeletedMessage)
 admin.site.register(ReadMessages)
+admin.site.register(PostVotes, PostVotesAdmin)

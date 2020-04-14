@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse, HttpResponseNotFound
 from django.views import generic
 from django.views.generic.base import View
 
@@ -24,7 +24,7 @@ from django.core.mail import send_mail
 from .decorators import async_func
 
 from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm, TopicForm, PostForm
-from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post
+from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post, PostVotes
 
 
 class IndexView(generic.ListView):
@@ -451,8 +451,23 @@ class TopicView(View):
     def post_list_response(self, request, post_form):
         topic_id = self.kwargs['topic_id']
         posts_list = Post.objects.filter(topic_id=topic_id).order_by('-creation_date')
+
+        if not request.user.is_anonymous:
+            user_post_votes = []
+            for post in posts_list:
+                try:
+                    post_vote_value = PostVotes.objects.get(user=request.user, post=post).vote_value
+                except ObjectDoesNotExist:
+                    post_vote_value = 0
+                user_post_votes.append(post_vote_value)
+
+            posts_with_vote_statuses = [[post, vote] for post, vote in zip(posts_list, user_post_votes)]
+
+        else:
+            posts_with_vote_statuses = [[post, None] for post in posts_list]
+
         return render(request, 'discussions/topic.html', {
-            'posts_list': posts_list,
+            'posts_and_votes_list': posts_with_vote_statuses,
             'post_form': post_form,
             'topic_id': topic_id
         })
@@ -483,3 +498,37 @@ class CreateTopicView(CheckUserMixin, View):
 
         return render(request, 'discussions/message_create.html', {'topic_form': topic_form,
                                                                    'post_form': post_form})
+
+
+class VotePostView(CheckUserMixin, View):
+    def get(self, request, direction, post_id):
+        if not request.is_ajax():
+            return HttpResponseNotFound("Page not found")
+
+        vote_value = 1 if direction == 'up' else -1
+
+        user = get_object_or_404(User, id=request.user.pk)
+        post = get_object_or_404(Post, id=post_id)
+
+        try:
+            post_votes_obj = PostVotes.objects.get(user=request.user, post=post)
+            previous_vote = post_votes_obj.vote_value
+
+            # in case that the doubled  ajax request was sent somehow
+            if previous_vote == vote_value:
+                return JsonResponse({
+                    'error': "Bad request.",
+                    'code': '400'
+                })
+
+            post_votes_obj.delete()
+
+        except ObjectDoesNotExist:
+            PostVotes(user=user, post=post, vote_value=vote_value).save()
+            previous_vote = 0
+
+        status = {
+            'votes': sum(PostVotes.objects.filter(post=post).values_list('vote_value', flat=True)),
+            'prev_vote': previous_vote
+        }
+        return JsonResponse(status)
