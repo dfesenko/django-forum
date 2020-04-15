@@ -18,6 +18,10 @@
 
 {% endif %}
 
+<p>User's posts amount: {{ user.profile.user_posts_amount }}</p>
+<p>Last forum activity at: {{ user.profile.user_last_forum_activity_date }}</p>
+<a href="{% url 'discussions:user_forum_activity' pk=user.pk %}">More info about forum activity</a>
+
 
 <ul>
     <li>Username: {{ user.username }}</li>

@@ -48,6 +48,14 @@ class UserDetailView(generic.DetailView):
     template_name = 'discussions/user_profile.html'
 
 
+class UserActivityView(generic.ListView):
+    template_name = 'discussions/user_forum_activity.html'
+    context_object_name = 'user_posts_list'
+
+    def get_queryset(self):
+        return Post.objects.filter(author=self.request.user).order_by("-creation_date")
+
+
 class CheckUserMixin(UserPassesTestMixin):
     login_url = reverse_lazy('discussions:login')
 
