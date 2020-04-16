@@ -53,7 +53,8 @@ class UserActivityView(generic.ListView):
     context_object_name = 'user_posts_list'
 
     def get_queryset(self):
-        return Post.objects.filter(author=self.request.user).order_by("-creation_date")
+        author = User.objects.get(pk=int(self.kwargs['pk']))
+        return Post.objects.filter(author=author).order_by("-creation_date")
 
 
 class CheckUserMixin(UserPassesTestMixin):
