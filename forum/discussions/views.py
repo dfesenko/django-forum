@@ -518,6 +518,12 @@ class VotePostView(CheckUserMixin, View):
         user = get_object_or_404(User, id=request.user.pk)
         post = get_object_or_404(Post, id=post_id)
 
+        if user == post.author:
+            return JsonResponse({
+                'error': "You cannot vote for your own posts",
+                'code': '400'
+            })
+
         try:
             post_votes_obj = PostVotes.objects.get(user=request.user, post=post)
             previous_vote = post_votes_obj.vote_value

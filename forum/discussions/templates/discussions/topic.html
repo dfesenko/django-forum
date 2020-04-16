@@ -55,7 +55,7 @@
             <p>{{ post.0.post_body }}</p>
             <p>Votes: <span>{{ post.0.votes }}</span></p>
 
-            {% if not request.user.is_anonymous %}
+            {% if not request.user.is_anonymous and request.user != post.0.author %}
                 {% if post.1 == 0 %}
                     <button class='vote' value="{{ post.0.pk }}">Like</button>
                     <button class='vote' value="{{ post.0.pk }}">Dislike</button>
