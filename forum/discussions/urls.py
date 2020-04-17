@@ -47,4 +47,6 @@ urlpatterns = [
     path('forums/<int:category_id>/', views.CategoryView.as_view(), name='category'),
     path('forums/topic/<int:topic_id>/', views.TopicView.as_view(), name='topic'),
     path('post/vote/<int:post_id>/<slug:direction>/', views.VotePostView.as_view(), name='vote_post'),
+    path('forums/topic/<int:topic_id>/subscription/', views.SubscribeTopicView.as_view(), name='subscription'),
+    path('feed/', views.FeedView.as_view(), name='feed'),
 ]

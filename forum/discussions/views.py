@@ -24,7 +24,7 @@ from django.core.mail import send_mail
 from .decorators import async_func
 
 from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm, TopicForm, PostForm
-from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post, PostVotes
+from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post, PostVotes, Subscription
 
 
 class IndexView(generic.ListView):
@@ -460,6 +460,7 @@ class TopicView(View):
     def post_list_response(self, request, post_form):
         topic_id = self.kwargs['topic_id']
         posts_list = Post.objects.filter(topic_id=topic_id).order_by('-creation_date')
+        is_subscribed = False
 
         if not request.user.is_anonymous:
             user_post_votes = []
@@ -472,13 +473,20 @@ class TopicView(View):
 
             posts_with_vote_statuses = [[post, vote] for post, vote in zip(posts_list, user_post_votes)]
 
+            try:
+                Subscription.objects.get(user=request.user, topic=topic_id)
+                is_subscribed = True
+            except ObjectDoesNotExist:
+                pass
+
         else:
             posts_with_vote_statuses = [[post, None] for post in posts_list]
 
         return render(request, 'discussions/topic.html', {
             'posts_and_votes_list': posts_with_vote_statuses,
             'post_form': post_form,
-            'topic_id': topic_id
+            'topic_id': topic_id,
+            'is_subscribed': is_subscribed
         })
 
 
@@ -547,3 +555,44 @@ class VotePostView(CheckUserMixin, View):
             'prev_vote': previous_vote
         }
         return JsonResponse(status)
+
+
+class SubscribeTopicView(CheckUserMixin, View):
+    def get(self, request, topic_id):
+        if not request.is_ajax():
+            return HttpResponseNotFound("Page not found")
+
+        user = get_object_or_404(User, id=request.user.pk)
+        topic = get_object_or_404(Topic, id=topic_id)
+
+        try:
+            subscription = Subscription.objects.get(user=user, topic=topic)
+            subscription.delete()
+            status = {'code': '200', 'message': 'Subscription removed'}
+        except ObjectDoesNotExist:
+            Subscription(user=user, topic=topic).save()
+            status = {'code': '200', 'message': 'Subscription created'}
+
+        return JsonResponse(status)
+
+
+class FeedView(CheckUserMixin, generic.ListView):
+    template_name = 'discussions/feed.html'
+    context_object_name = 'posts_list'
+
+    def get_queryset(self):
+        subscriptions = Subscription.objects.filter(user=self.request.user)
+        subscribed_to_topics = subscriptions.values_list('topic', flat=True)
+        times_of_subscription = subscriptions.values_list('creation_date', flat=True)
+        posts_list = []
+
+        for subscription in subscriptions:
+            posts = Post.objects.filter(topic=subscription.topic) \
+                .exclude(creation_date__lte=subscription.creation_date)
+            posts_list.extend(posts)
+
+        return sorted(posts_list, key=lambda x: x.creation_date, reverse=True)
+
+
+
+

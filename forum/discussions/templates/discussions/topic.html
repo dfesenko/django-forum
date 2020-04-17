@@ -3,7 +3,7 @@
 {% block javascript %}
   <script>
     $(".vote").on("click", function () {
-      el = $(this)
+      var el = $(this)
 
       var elContent = el.text();
       var postId = el.val();
@@ -25,6 +25,22 @@
         }
       });
     });
+
+    $(".subscription").on("click", function () {
+      var el = $(this)
+
+      $.ajax({
+        url: '{% url 'discussions:subscription' topic_id=topic_id %}',
+        dataType: 'json',
+        success: function (data) {
+          if (data.message == 'Subscription created') {
+            el.text('Unsubscribe from this topic');
+          } else if (data.message == 'Subscription removed') {
+            el.text('Subscribe to this topic');
+          }
+        }
+      });
+    });
   </script>
 {% endblock %}
 
@@ -41,6 +57,13 @@
         </table>
         <input type="submit" value="Add post">
     </form>
+
+    {% if is_subscribed %}
+        <button class='subscription' value="{{ topic_id }}">Unsubscribe from this topic</button>
+    {% else %}
+        <button class='subscription' value="{{ topic_id }}">Subscribe to this topic</button>
+    {% endif %}
+
 {% endif %}
 
 
