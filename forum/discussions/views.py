@@ -582,8 +582,6 @@ class FeedView(CheckUserMixin, generic.ListView):
 
     def get_queryset(self):
         subscriptions = Subscription.objects.filter(user=self.request.user)
-        subscribed_to_topics = subscriptions.values_list('topic', flat=True)
-        times_of_subscription = subscriptions.values_list('creation_date', flat=True)
         posts_list = []
 
         for subscription in subscriptions:
