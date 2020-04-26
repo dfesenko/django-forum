@@ -24,7 +24,8 @@ from django.core.mail import send_mail
 from .decorators import async_func
 
 from .forms import UserInfoForm, ProfileInfoForm, SignupForm, MessageForm, TopicForm, PostForm
-from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post, PostVotes, Subscription
+from .models import Profile, Message, DeletedMessage, ReadMessages, Category, Topic, Post, \
+                    PostVotes, Subscription, ReadPost
 
 
 class IndexView(generic.ListView):
@@ -587,10 +588,24 @@ class FeedView(CheckUserMixin, generic.ListView):
         for subscription in subscriptions:
             posts = Post.objects.filter(topic=subscription.topic) \
                 .exclude(creation_date__lte=subscription.creation_date)
+
+            read_posts = ReadPost.objects.filter(user=self.request.user).values_list('post', flat=True)
+            posts = posts.exclude(pk__in=read_posts)
+
             posts_list.extend(posts)
 
         return sorted(posts_list, key=lambda x: x.creation_date, reverse=True)
 
 
+class MarkReadView(CheckUserMixin, View):
+    def get(self, request, post_id):
+        user = get_object_or_404(User, id=request.user.pk)
+        post = get_object_or_404(Post, id=post_id)
 
-
+        try:
+            get_object_or_404(ReadPost, user=user, post=post)
+            return HttpResponseNotFound("This post is already marked as read by user")
+        except Http404:
+            read_post = ReadPost(user=user, post=post)
+            read_post.save()
+            return redirect('discussions:feed')
