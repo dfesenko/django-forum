@@ -407,7 +407,7 @@ class RestoreMessageView(CheckUserMixin, View):
         return Http404('The page does not exist')
 
 
-class ReadMessageView(CheckUserMixin, View):
+class MarkReadMessageView(CheckUserMixin, View):
 
     def get(self, request, message_id, read_action):
         user_instance = get_object_or_404(User, id=request.user.pk)
