@@ -66,13 +66,6 @@ class CheckUserMixin(UserPassesTestMixin):
         return allow_access
 
 
-class CheckMailboxUserMixin(CheckUserMixin):
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated and self.request.user.pk == int(self.kwargs['pk'])
-        return allow_access
-
-
 class UserPageView(CheckUserMixin, View):
     """
     The view for redirecting user to his/her profile page with dynamic url
@@ -244,7 +237,7 @@ class MessageSentView(CheckUserMixin, View):
                                                                    'receiver': receiver_instance})
 
 
-class InboxView(CheckMailboxUserMixin, generic.ListView):
+class InboxView(CheckUserMixin, generic.ListView):
     template_name = 'discussions/inbox.html'
     context_object_name = 'received_messages_list'
 
@@ -267,7 +260,7 @@ class InboxView(CheckMailboxUserMixin, generic.ListView):
         return messages_with_read_statuses
 
 
-class OutboxView(CheckMailboxUserMixin, generic.ListView):
+class OutboxView(CheckUserMixin, generic.ListView):
     template_name = 'discussions/outbox.html'
     context_object_name = 'sent_messages_list'
 
@@ -290,8 +283,8 @@ class OutboxView(CheckMailboxUserMixin, generic.ListView):
         return messages_with_read_statuses
 
 
-class BucketView(CheckMailboxUserMixin, generic.ListView):
-    template_name = 'discussions/deleted_messages.html'
+class BucketView(CheckUserMixin, generic.ListView):
+    template_name = 'discussions/bucket.html'
     context_object_name = 'deleted_messages_list'
 
     def get_queryset(self):

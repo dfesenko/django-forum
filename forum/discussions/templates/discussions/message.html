@@ -4,11 +4,11 @@
 
 
 {% if is_from_bucket %}
-<p> Return to <a href="{% url 'discussions:bucket' pk=request.user.pk %}"> Bucket </a> </p>
+<p> Return to <a href="{% url 'discussions:bucket' %}"> Bucket </a> </p>
 {% elif request.user == message.receiver%}
-<p> Return to <a href="{% url 'discussions:inbox' pk=request.user.pk %}"> Inbox </a> </p>
+<p> Return to <a href="{% url 'discussions:inbox' %}"> Inbox </a> </p>
 {% else %}
-<p> Return to <a href="{% url 'discussions:outbox' pk=request.user.pk %}"> Outbox </a> </p>
+<p> Return to <a href="{% url 'discussions:outbox' %}"> Outbox </a> </p>
 {% endif %}
 
 

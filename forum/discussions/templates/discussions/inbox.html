@@ -4,9 +4,9 @@
 
 <h1>{{ request.user.username }} - Inbox</h1>
 
-<a href="{% url 'discussions:inbox' pk=request.user.pk %}">Inbox</a> /
-<a href="{% url 'discussions:outbox' pk=request.user.pk %}">Outbox</a> /
-<a href="{% url 'discussions:bucket' pk=request.user.pk %}">Bucket</a>
+<a href="{% url 'discussions:inbox' %}">Inbox</a> /
+<a href="{% url 'discussions:outbox' %}">Outbox</a> /
+<a href="{% url 'discussions:bucket' %}">Bucket</a>
 
 {% if received_messages_list %}
 
