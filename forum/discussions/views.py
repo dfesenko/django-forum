@@ -184,7 +184,7 @@ class UserPageEditView(CheckUserMixin, View):
             profile_model_instance = profile_form.save(commit=False)
             profile_model_instance.save(update_fields=not_empty_fields_profile)
 
-            return redirect('discussions:detail', pk=request.user.pk)
+            return redirect('discussions:user_details', pk=request.user.pk)
 
 
 class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):
@@ -231,7 +231,7 @@ class MessageSentView(CheckUserMixin, View):
         if message_form.is_valid():
             message_form.save()
 
-            return redirect('discussions:detail', pk=receiver_id)
+            return redirect('discussions:user_details', pk=receiver_id)
 
         return render(request, 'discussions/message_create.html', {'message_form': message_form,
                                                                    'receiver': receiver_instance})
