@@ -1,0 +1,37 @@
+{% extends "discussions/base.html" %}
+
+{% block content %}
+
+
+{% if is_from_bucket %}
+<p> Return to <a href="{% url 'messages:bucket' %}"> Bucket </a> </p>
+{% elif request.user == message.receiver%}
+<p> Return to <a href="{% url 'messages:inbox' %}"> Inbox </a> </p>
+{% else %}
+<p> Return to <a href="{% url 'messages:outbox' %}"> Outbox </a> </p>
+{% endif %}
+
+
+{% if is_read %}
+    <a href="{% url 'messages:read_unread' message_id=message.pk read_action='as_unread' %}">Mark as unread</a>
+{% else %}
+    <a href="{% url 'messages:read_unread' message_id=message.pk read_action='as_read' %}">Mark as read</a>
+{% endif %}
+
+<p>From: <i>{{message.sender}}</i></p>
+<p>To: <i>{{message.receiver}}</i></p>
+<p>At: <i>{{message.created_at}}</i></p>
+
+<h3>Subject: {{ message.subject }} </h3>
+
+<p> {{ message.msg_content }} </p>
+
+{% if is_deleted %}
+<a href="{% url 'messages:delete_message' message_id=message.pk %}">Delete permanently</a> /
+<a href="{% url 'messages:restore_message' message_id=message.pk %}"> Restore </a>
+{% else %}
+<a href="{% url 'messages:delete_message' message_id=message.pk %}">Delete message</a>
+{% endif %}
+
+
+{% endblock %}

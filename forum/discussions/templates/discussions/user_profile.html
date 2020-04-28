@@ -14,7 +14,7 @@
 
 {% elif request.user.is_authenticated %}
 
-    <a href="{% url 'discussions:message_create' pk=user.pk %}">Send message</a>
+    <a href="{% url 'messages:message_create' pk=user.pk %}">Send message</a>
 
 {% endif %}
 

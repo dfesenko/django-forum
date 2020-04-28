@@ -4,9 +4,9 @@
 
 <h1>{{ request.user.username }} - Outbox</h1>
 
-<a href="{% url 'discussions:inbox' %}">Inbox</a> /
-<a href="{% url 'discussions:outbox' %}">Outbox</a> /
-<a href="{% url 'discussions:bucket'  %}">Bucket</a>
+<a href="{% url 'messages:inbox' %}">Inbox</a> /
+<a href="{% url 'messages:outbox' %}">Outbox</a> /
+<a href="{% url 'messages:bucket'  %}">Bucket</a>
 
 
 {% if sent_messages_list %}
@@ -16,14 +16,14 @@
     <table>
     {% for message in sent_messages_list %}
         <tr>
-            <td><a href="{% url 'discussions:message' message_id=message.0.pk %}">{{ message.0.subject }} </a></td>
+            <td><a href="{% url 'messages:message' message_id=message.0.pk %}">{{ message.0.subject }} </a></td>
             <td>
                 {% if message.1 %} -
-                <a href="{% url 'discussions:read_unread' message_id=message.0.pk read_action='as_unread' %}">
+                <a href="{% url 'messages:read_unread' message_id=message.0.pk read_action='as_unread' %}">
                         Mark as unread
                 </a>
                 {% else %} -
-                    <a href="{% url 'discussions:read_unread' message_id=message.0.pk read_action='as_read' %}">
+                    <a href="{% url 'messages:read_unread' message_id=message.0.pk read_action='as_read' %}">
                         Mark as read
                     </a>
                 {% endif %}

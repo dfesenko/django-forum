@@ -4,7 +4,7 @@
 
 <h1>{{ receiver.username }} - Send message</h1>
 
-<form method="post" action="{% url 'discussions:message_create' pk=receiver.pk %}" >
+<form method="post" action="{% url 'messages:message_create' pk=receiver.pk %}" >
 
 {% csrf_token %}
 

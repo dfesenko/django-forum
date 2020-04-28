@@ -2,7 +2,7 @@
 
 {% if request.user.is_authenticated %}
 
-    / <a href="{% url 'discussions:inbox' %}">Mails</a>
+    / <a href="{% url 'messages:inbox' %}">Mails</a>
 
     <p>Hello, {{ request.user.username }}! </p>
 
