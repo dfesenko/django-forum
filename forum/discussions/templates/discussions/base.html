@@ -7,7 +7,7 @@
     <p>Hello, {{ request.user.username }}! </p>
 
     <a href="{% url 'discussions:user_details' request.user.pk %}">My profile</a> /
-    <a href="{% url 'discussions:feed' %}">My feed</a> /
+    <a href="{% url 'feed:feed' %}">My feed</a> /
     <a href="{% url 'discussions:logout' %}">Logout</a>
 
 {% else %}

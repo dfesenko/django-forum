@@ -1,2 +1,5 @@
 /venv/
 README.md
+/forum/feed/migrations/
+/forum/discussions/migrations/
+/forum/messages/migrations/

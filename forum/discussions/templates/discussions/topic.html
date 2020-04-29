@@ -30,7 +30,7 @@
       var el = $(this)
 
       $.ajax({
-        url: '{% url 'discussions:subscription' topic_id=topic_id %}',
+        url: '{% url 'feed:subscription' topic_id=topic_id %}',
         dataType: 'json',
         success: function (data) {
           if (data.message == 'Subscription created') {

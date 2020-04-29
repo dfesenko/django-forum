@@ -10,7 +10,7 @@
     {% for post in posts_list %}
         <li>
             <a href="{% url 'discussions:topic' topic_id=post.topic.pk %}#{{ post.pk }}">{{ post.topic }}</a>
-            <p><a href="{% url 'discussions:mark_read' post_id=post.pk %}">Mark as read</a></p>
+            <p><a href="{% url 'feed:mark_read' post_id=post.pk %}">Mark as read</a></p>
             <p> {{ post.post_body }} </p>
             <p> {{ post.creation_date }} </p>
             <p> Votes: {{ post.votes }} </p>

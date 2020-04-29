@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, Category, Topic, Post, PostVotes, Subscription, ReadPost
+from .models import Profile, Category, Topic, Post, PostVotes
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -19,14 +19,8 @@ class PostVotesAdmin(admin.ModelAdmin):
     list_display = ('user', 'post', 'vote_value')
 
 
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('user', 'topic', 'creation_date')
-
-
 admin.site.register(Profile)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)
-admin.site.register(ReadPost)
 admin.site.register(PostVotes, PostVotesAdmin)
-admin.site.register(Subscription, SubscriptionAdmin)
