@@ -5,3 +5,4 @@ README.md
 /forum/profiles/migrations/
 /forum/messaging/migrations/
 /forum/core/migrations/
+/forum/registration/migrations/

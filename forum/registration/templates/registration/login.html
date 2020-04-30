@@ -15,7 +15,7 @@
     {% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'discussions:login' %}">
+<form method="post" action="{% url 'registration:login' %}">
 {% csrf_token %}
 <table>
 <tr>
@@ -32,6 +32,6 @@
 <input type="hidden" name="next" value="{{ next }}">
 </form>
 
-<p><a href="{% url 'discussions:password_reset' %}">Forgot password</a></p>
+<p><a href="{% url 'registration:password_reset' %}">Forgot password</a></p>
 
 {% endblock %}

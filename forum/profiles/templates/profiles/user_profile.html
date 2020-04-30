@@ -10,7 +10,7 @@
 {% if request.user.is_authenticated and request.user.pk == user.pk %}
 
     <a href="{% url 'profiles:edit_profile' %}">Edit profile</a> /
-    <a href="{% url 'discussions:password_change' %}">Change password</a>
+    <a href="{% url 'registration:password_change' %}">Change password</a>
 
 {% elif request.user.is_authenticated %}
 

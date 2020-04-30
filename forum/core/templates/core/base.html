@@ -8,12 +8,12 @@
 
     <a href="{% url 'profiles:user_details' request.user.pk %}">My profile</a> /
     <a href="{% url 'feed:feed' %}">My feed</a> /
-    <a href="{% url 'discussions:logout' %}">Logout</a>
+    <a href="{% url 'registration:logout' %}">Logout</a>
 
 {% else %}
 
     <p>
-        <a href="{% url 'discussions:login' %}">Login</a> / <a href="{% url 'discussions:signup' %}">Sign up</a>
+        <a href="{% url 'registration:login' %}">Login</a> / <a href="{% url 'registration:signup' %}">Sign up</a>
     </p>
 
 {% endif %}

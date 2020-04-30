@@ -1,29 +1,16 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse, HttpResponseNotFound
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse, HttpResponseNotFound
 from django.views import generic
 from django.views.generic.base import View
 
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.views import PasswordResetDoneView, PasswordChangeDoneView
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
-from django.urls import reverse, reverse_lazy
-
-from django.contrib.sites.shortcuts import get_current_site
-
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from .tokens import account_activation_token
+from django.urls import reverse_lazy
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
-from .decorators import async_func
-
-from .forms import SignupForm, TopicForm, PostForm
+from .forms import TopicForm, PostForm
 from .models import Category, Topic, Post, PostVotes
 from feed.models import Subscription
 
@@ -41,106 +28,6 @@ class CheckUserMixin(UserPassesTestMixin):
 
     def test_func(self):
         allow_access = self.request.user.is_authenticated
-        return allow_access
-
-
-class UserSignupView(View):
-
-    @async_func
-    def send_async_mail(self, subject, text_message, html_message, from_email, to_email):
-        send_mail(subject=subject, message=text_message, html_message=html_message,
-                  from_email=from_email, recipient_list=[to_email])
-
-    def get(self, request, *args, **kwargs):
-        form = SignupForm()
-        return render(request, 'registration/signup.html', {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
-
-            current_site = get_current_site(request)
-            mail_subject = "Activate your forum's account."
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = account_activation_token.make_token(user)
-
-            html_message = render_to_string('registration/account_activation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': uid,
-                'token': token,
-            })
-
-            text_message = render_to_string('registration/account_activation_email.txt', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': uid,
-                'token': token,
-            })
-
-            from_email = 'forum.djangotest@gmail.com'
-            to_email = form.cleaned_data.get('email')
-
-            self.send_async_mail(subject=mail_subject, text_message=text_message, html_message=html_message,
-                                 from_email=from_email, to_email=to_email)
-
-            return redirect('discussions:email_confirm')
-        else:
-            return render(request, 'registration/signup.html', {'form': form})
-
-
-class EmailConfirmView(View):
-    def get(self, request):
-        return render(request, 'registration/email_confirm.html')
-
-
-class UserActivationView(View):
-
-    def get(self, request, uidb64, token):
-
-        try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
-            user = User.objects.get(pk=uid)
-        except(TypeError, ValueError, OverflowError, ObjectDoesNotExist):
-            user = None
-
-        if user is not None and account_activation_token.check_token(user, token):
-            user.is_active = True
-            user.save()
-            login(request, user)
-            return render(request, 'registration/email_confirm_done.html')
-        else:
-            return render(request, 'registration/email_confirm_invalid.html')
-
-
-class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):
-    login_url = reverse_lazy('core:index')
-
-    def test_func(self):
-        prev_page = self.request.META.get('HTTP_REFERER')
-        if prev_page:
-            is_prev_page_was_passw_reset = '/password_reset/' in prev_page
-        else:
-            return False
-
-        allow_access = is_prev_page_was_passw_reset and not self.request.user.is_authenticated
-        return allow_access
-
-
-class UserPasswordChangeDoneView(UserPassesTestMixin, PasswordChangeDoneView):
-    login_url = reverse_lazy('core:index')
-
-    def test_func(self):
-        prev_page = self.request.META.get('HTTP_REFERER')
-        if prev_page:
-            is_prev_page_was_passw_change = '/password_change/' in prev_page
-        else:
-            return False
-
-        allow_access = is_prev_page_was_passw_change and self.request.user.is_authenticated
         return allow_access
 
 

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'core.apps.CoreConfig',
+    'registration.apps.RegistrationConfig',
     'profiles.apps.ProfilesConfig',
     'feed.apps.FeedConfig',
     'messaging.apps.MessagingConfig',
