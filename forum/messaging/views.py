@@ -17,8 +17,8 @@ class MessageSentView(CheckUserMixin, View):
     def get(self, request, pk):
         receiver = User.objects.get(pk=pk)
         message_form = MessageForm(initial={'sender': request.user, 'receiver': receiver})
-        return render(request, 'messages/message_create.html', {'message_form': message_form,
-                                                                'receiver': receiver})
+        return render(request, 'messaging/message_create.html', {'message_form': message_form,
+                                                                 'receiver': receiver})
 
     def post(self, request, *args, **kwargs):
         message_form = MessageForm(request.POST)
@@ -30,12 +30,12 @@ class MessageSentView(CheckUserMixin, View):
 
             return redirect('discussions:user_details', pk=receiver_id)
 
-        return render(request, 'messages/message_create.html', {'message_form': message_form,
-                                                                'receiver': receiver_instance})
+        return render(request, 'messaging/message_create.html', {'message_form': message_form,
+                                                                 'receiver': receiver_instance})
 
 
 class InboxView(CheckUserMixin, generic.ListView):
-    template_name = 'messages/inbox.html'
+    template_name = 'messaging/inbox.html'
     context_object_name = 'received_messages_list'
 
     def get_queryset(self):
@@ -58,7 +58,7 @@ class InboxView(CheckUserMixin, generic.ListView):
 
 
 class OutboxView(CheckUserMixin, generic.ListView):
-    template_name = 'messages/outbox.html'
+    template_name = 'messaging/outbox.html'
     context_object_name = 'sent_messages_list'
 
     def get_queryset(self):
@@ -81,7 +81,7 @@ class OutboxView(CheckUserMixin, generic.ListView):
 
 
 class BucketView(CheckUserMixin, generic.ListView):
-    template_name = 'messages/bucket.html'
+    template_name = 'messaging/bucket.html'
     context_object_name = 'deleted_messages_list'
 
     def get_queryset(self):
@@ -104,7 +104,7 @@ class BucketView(CheckUserMixin, generic.ListView):
 
 
 class MessageView(UserPassesTestMixin, View):
-    login_url = reverse_lazy('messages:login')
+    login_url = reverse_lazy('messaging:login')
 
     def test_func(self):
         message = Message.objects.get(pk=int(self.kwargs['message_id']))
@@ -132,10 +132,10 @@ class MessageView(UserPassesTestMixin, View):
 
         is_read = ReadMessages.objects.filter(user=request.user.pk, message=message)
 
-        return render(request, 'messages/message.html', {'message': message,
-                                                         'is_from_bucket': is_from_bucket,
-                                                         'is_deleted': is_deleted,
-                                                         'is_read': is_read})
+        return render(request, 'messaging/message.html', {'message': message,
+                                                          'is_from_bucket': is_from_bucket,
+                                                          'is_deleted': is_deleted,
+                                                          'is_read': is_read})
 
 
 class DeleteMessageView(CheckUserMixin, View):
@@ -176,14 +176,14 @@ class DeleteMessageView(CheckUserMixin, View):
                     deleted_message.is_deleted_permanently = True
                     deleted_message.save()
 
-                return redirect('messages:bucket')
+                return redirect('messaging:bucket')
 
             else:
                 # if the message was not in bucket, move it there (by creating the corresponding DeletedMessage object)
                 deleted_message = DeletedMessage(user=request.user, message=message)
                 deleted_message.save()
 
-            return redirect('messages:inbox') if is_receiver else redirect('messages:outbox')
+            return redirect('messaging:inbox') if is_receiver else redirect('messaging:outbox')
         return Http404('The page does not exist')
 
 
@@ -198,7 +198,7 @@ class RestoreMessageView(CheckUserMixin, View):
         # only sender or receiver can restore their own messages
         if any([is_sender, is_receiver]):
             DeletedMessage.objects.get(user=request.user, message=message).delete()
-            return redirect('messages:bucket')
+            return redirect('messaging:bucket')
 
         return Http404('The page does not exist')
 

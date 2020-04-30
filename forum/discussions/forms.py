@@ -1,19 +1,7 @@
 from django.forms import ModelForm, EmailField, CharField, Textarea, Select, ChoiceField, ModelChoiceField
-from .models import User, Profile, Topic, Post
+from .models import User, Topic, Post
 
 from django.contrib.auth.forms import UserCreationForm
-
-
-class UserInfoForm(ModelForm):
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email']
-
-
-class ProfileInfoForm(ModelForm):
-    class Meta:
-        model = Profile
-        fields = ['user_location', 'user_about', 'user_avatar']
 
 
 class SignupForm(UserCreationForm):

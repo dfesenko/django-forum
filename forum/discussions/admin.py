@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Profile, Category, Topic, Post, PostVotes
+from .models import Category, Topic, Post, PostVotes
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -19,7 +19,6 @@ class PostVotesAdmin(admin.ModelAdmin):
     list_display = ('user', 'post', 'vote_value')
 
 
-admin.site.register(Profile)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Topic, TopicAdmin)
 admin.site.register(Post, PostAdmin)

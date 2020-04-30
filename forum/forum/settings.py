@@ -31,8 +31,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'profiles.apps.ProfilesConfig',
     'feed.apps.FeedConfig',
-    'messages.apps.MessagesConfig',
+    'messaging.apps.MessagingConfig',
     'discussions.apps.DiscussionsConfig',
     'django.contrib.admin',
     'django.contrib.auth',

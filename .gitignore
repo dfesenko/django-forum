@@ -2,4 +2,5 @@
 README.md
 /forum/feed/migrations/
 /forum/discussions/migrations/
-/forum/messages/migrations/
+/forum/profiles/migrations/
+/forum/messaging/migrations/

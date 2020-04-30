@@ -9,18 +9,18 @@
 
 {% if request.user.is_authenticated and request.user.pk == user.pk %}
 
-    <a href="{% url 'discussions:edit_profile' %}">Edit profile</a> /
+    <a href="{% url 'profiles:edit_profile' %}">Edit profile</a> /
     <a href="{% url 'discussions:password_change' %}">Change password</a>
 
 {% elif request.user.is_authenticated %}
 
-    <a href="{% url 'messages:message_create' pk=user.pk %}">Send message</a>
+    <a href="{% url 'messaging:message_create' pk=user.pk %}">Send message</a>
 
 {% endif %}
 
 <p>User's posts amount: {{ user.profile.user_posts_amount }}</p>
 <p>Last forum activity at: {{ user.profile.user_last_forum_activity_date }}</p>
-<a href="{% url 'discussions:user_forum_activity' pk=user.pk %}">More info about forum activity</a>
+<a href="{% url 'profiles:user_forum_activity' pk=user.pk %}">More info about forum activity</a>
 
 
 <ul>

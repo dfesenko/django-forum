@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 
-app_name = 'messages'
+app_name = 'messaging'
 urlpatterns = [
     path('users/<int:pk>/message/', views.MessageSentView.as_view(), name='message_create'),
     path('users/inbox/', views.InboxView.as_view(), name='inbox'),
