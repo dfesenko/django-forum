@@ -20,6 +20,14 @@ class SubscribeTopicView(CheckUserMixin, View):
 
         try:
             subscription = Subscription.objects.get(user=user, topic=topic)
+
+            # remove info about read posts when unsubscribing
+            read_posts = ReadPost.objects.filter(user=self.request.user,
+                                                 post__in=Post.objects.filter(topic=subscription.topic))
+
+            for read_post in read_posts:
+                read_post.delete()
+
             subscription.delete()
             status = {'code': '200', 'message': 'Subscription removed'}
         except ObjectDoesNotExist:
