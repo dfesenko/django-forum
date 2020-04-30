@@ -42,7 +42,7 @@ class FeedView(CheckUserMixin, generic.ListView):
                 .exclude(creation_date__lte=subscription.creation_date)
 
             read_posts = ReadPost.objects.filter(user=self.request.user).values_list('post', flat=True)
-            posts = posts.exclude(pk__in=read_posts)
+            posts = posts.exclude(pk__in=read_posts).exclude(author=self.request.user)
 
             posts_list.extend(posts)
 
