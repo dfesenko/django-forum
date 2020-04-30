@@ -28,14 +28,6 @@ from .models import Category, Topic, Post, PostVotes
 from feed.models import Subscription
 
 
-class IndexView(generic.ListView):
-    template_name = 'discussions/index.html'
-    context_object_name = 'users_list'
-
-    def get_queryset(self):
-        return User.objects.all()
-
-
 class ForumView(generic.ListView):
     template_name = 'discussions/forum.html'
     context_object_name = 'categories_list'
@@ -125,7 +117,7 @@ class UserActivationView(View):
 
 
 class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):
-    login_url = reverse_lazy('discussions:index')
+    login_url = reverse_lazy('core:index')
 
     def test_func(self):
         prev_page = self.request.META.get('HTTP_REFERER')
@@ -139,7 +131,7 @@ class UserPasswordResetDoneView(UserPassesTestMixin, PasswordResetDoneView):
 
 
 class UserPasswordChangeDoneView(UserPassesTestMixin, PasswordChangeDoneView):
-    login_url = reverse_lazy('discussions:index')
+    login_url = reverse_lazy('core:index')
 
     def test_func(self):
         prev_page = self.request.META.get('HTTP_REFERER')

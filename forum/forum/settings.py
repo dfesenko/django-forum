@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'core.apps.CoreConfig',
     'profiles.apps.ProfilesConfig',
     'feed.apps.FeedConfig',
     'messaging.apps.MessagingConfig',

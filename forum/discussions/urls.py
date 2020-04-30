@@ -7,7 +7,6 @@ from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, 
 
 app_name = 'discussions'
 urlpatterns = [
-    path('', views.IndexView.as_view(), name='index'),
     path('signup/', views.UserSignupView.as_view(), name='signup'),
     path('email-confirm/', views.EmailConfirmView.as_view(), name='email_confirm'),
     path('account-activation/<uidb64>/<token>/', views.UserActivationView.as_view(), name='activation'),
