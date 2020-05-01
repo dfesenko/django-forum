@@ -14,7 +14,6 @@ from feed.models import Subscription
 from core.views import CheckUserMixin
 
 
-
 class ForumView(generic.ListView):
     template_name = 'discussions/forum.html'
     context_object_name = 'categories_list'
