@@ -28,7 +28,7 @@ class MessageSentView(CheckUserMixin, View):
         if message_form.is_valid():
             message_form.save()
 
-            return redirect('discussions:user_details', pk=receiver_id)
+            return redirect('profiles:user_details', pk=receiver_id)
 
         return render(request, 'messaging/message_create.html', {'message_form': message_form,
                                                                  'receiver': receiver_instance})
