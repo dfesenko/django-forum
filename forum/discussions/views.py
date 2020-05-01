@@ -52,6 +52,7 @@ class TopicView(View):
         posts_list = Post.objects.filter(topic_id=topic_id).order_by('-creation_date')
         is_subscribed = False
 
+        # generating list with states of voting for each post in the list for the given user
         if not request.user.is_anonymous:
             user_post_votes = []
             for post in posts_list:
