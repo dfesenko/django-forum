@@ -6,7 +6,7 @@ from django.http import Http404, JsonResponse, HttpResponseNotFound
 from django.core.exceptions import ObjectDoesNotExist
 
 from .models import Subscription, ReadPost
-from discussions.views import CheckUserMixin
+from core.views import CheckUserMixin
 from discussions.models import Topic, Post
 
 

@@ -4,15 +4,15 @@ from django.views import generic
 from django.views.generic.base import View
 
 from django.contrib.auth.models import User
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
 
 from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import TopicForm, PostForm
 from .models import Category, Topic, Post, PostVotes
 from feed.models import Subscription
+from core.views import CheckUserMixin
+
 
 
 class ForumView(generic.ListView):
@@ -21,14 +21,6 @@ class ForumView(generic.ListView):
 
     def get_queryset(self):
         return Category.objects.all()
-
-
-class CheckUserMixin(UserPassesTestMixin):
-    login_url = reverse_lazy('discussions:login')
-
-    def test_func(self):
-        allow_access = self.request.user.is_authenticated
-        return allow_access
 
 
 class CategoryView(generic.ListView):

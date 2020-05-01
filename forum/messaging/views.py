@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
 
-from discussions.views import CheckUserMixin
+from core.views import CheckUserMixin
 from .models import Message, DeletedMessage, ReadMessages
 from .forms import MessageForm
 

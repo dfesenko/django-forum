@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 
 from .forms import UserInfoForm, ProfileInfoForm
 from .models import Profile
-from discussions.views import CheckUserMixin
+from core.views import CheckUserMixin
 from discussions.models import Post
 
 
