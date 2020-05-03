@@ -21,6 +21,11 @@ class ForumView(generic.ListView):
     def get_queryset(self):
         return Category.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super(ForumView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Forum'
+        return context
+
 
 class CategoryView(generic.ListView):
     template_name = 'discussions/category.html'
@@ -28,6 +33,12 @@ class CategoryView(generic.ListView):
 
     def get_queryset(self):
         return Topic.objects.filter(category_id=self.kwargs['category_id'])
+
+    def get_context_data(self, **kwargs):
+        category_name = Category.objects.get(pk=self.kwargs['category_id']).category_name
+        context = super(CategoryView, self).get_context_data(**kwargs)
+        context['page_title'] = category_name
+        return context
 
 
 class TopicView(View):
@@ -77,7 +88,8 @@ class TopicView(View):
             'posts_and_votes_list': posts_with_vote_statuses,
             'post_form': post_form,
             'topic_id': topic_id,
-            'is_subscribed': is_subscribed
+            'is_subscribed': is_subscribed,
+            'page_title': Topic.objects.get(pk=topic_id).topic_title
         })
 
 
@@ -86,7 +98,8 @@ class CreateTopicView(CheckUserMixin, View):
         topic_form = TopicForm()
         post_form = PostForm()
         return render(request, 'discussions/topic_create.html', {'topic_form': topic_form,
-                                                                 'post_form': post_form})
+                                                                 'post_form': post_form,
+                                                                 'page_title': 'Create new topic'})
 
     def post(self, request, *args, **kwargs):
         topic_form = TopicForm(request.POST)
@@ -105,7 +118,8 @@ class CreateTopicView(CheckUserMixin, View):
             return redirect('discussions:forum')
 
         return render(request, 'discussions/topic_create.html', {'topic_form': topic_form,
-                                                                 'post_form': post_form})
+                                                                 'post_form': post_form,
+                                                                 'page_title': 'Create new topic'})
 
 
 class VotePostView(CheckUserMixin, View):
