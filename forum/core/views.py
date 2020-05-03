@@ -11,6 +11,11 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return User.objects.all()
 
+    def get_context_data(self, **kwargs):
+        context = super(IndexView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Forum website'
+        return context
+
 
 class CheckUserMixin(LoginRequiredMixin):
     login_url = reverse_lazy('registration:login')
