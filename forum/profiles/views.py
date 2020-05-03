@@ -15,6 +15,15 @@ class UserDetailView(generic.DetailView):
     model = User
     template_name = 'profiles/user_profile.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data(**kwargs)
+        if self.request.user.pk == int(self.kwargs['pk']):
+            page_title = "My profile"
+        else:
+            page_title = f"{User.objects.get(pk=int(self.kwargs['pk'])).username} - Profile"
+        context['page_title'] =  page_title
+        return context
+
 
 class UserActivityView(generic.ListView):
     template_name = 'profiles/user_forum_activity.html'
@@ -23,6 +32,11 @@ class UserActivityView(generic.ListView):
     def get_queryset(self):
         author = User.objects.get(pk=int(self.kwargs['pk']))
         return Post.objects.filter(author=author).order_by("-creation_date")
+
+    def get_context_data(self, **kwargs):
+        context = super(UserActivityView, self).get_context_data(**kwargs)
+        context['page_title'] = f"{User.objects.get(pk=int(self.kwargs['pk'])).username} - User's forum activity"
+        return context
 
 
 class UserPageView(CheckUserMixin, View):
@@ -53,7 +67,8 @@ class UserPageEditView(CheckUserMixin, View):
 
         return render(request, 'profiles/profile_edit.html', {'user_form': user_form,
                                                               'profile_form': profile_form,
-                                                              'user_avatar': user_avatar})
+                                                              'user_avatar': user_avatar,
+                                                              'page_title': "Edit profile"})
 
     def post(self, request, *args, **kwargs):
         user_instance = get_object_or_404(User, id=request.user.pk)

@@ -56,6 +56,11 @@ class FeedView(CheckUserMixin, generic.ListView):
 
         return sorted(posts_list, key=lambda x: x.creation_date, reverse=True)
 
+    def get_context_data(self, **kwargs):
+        context = super(FeedView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Feed'
+        return context
+
 
 class MarkReadView(CheckUserMixin, View):
     def get(self, request, post_id):

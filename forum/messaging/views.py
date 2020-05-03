@@ -18,7 +18,8 @@ class MessageSentView(CheckUserMixin, View):
         receiver = User.objects.get(pk=pk)
         message_form = MessageForm(initial={'sender': request.user, 'receiver': receiver})
         return render(request, 'messaging/message_create.html', {'message_form': message_form,
-                                                                 'receiver': receiver})
+                                                                 'receiver': receiver,
+                                                                 'page_title': self.get_page_title(pk)})
 
     def post(self, request, *args, **kwargs):
         message_form = MessageForm(request.POST)
@@ -27,11 +28,14 @@ class MessageSentView(CheckUserMixin, View):
 
         if message_form.is_valid():
             message_form.save()
-
             return redirect('profiles:user_details', pk=receiver_id)
 
         return render(request, 'messaging/message_create.html', {'message_form': message_form,
-                                                                 'receiver': receiver_instance})
+                                                                 'receiver': receiver_instance,
+                                                                 'page_title': self.get_page_title(receiver_id)})
+
+    def get_page_title(self, user_id):
+        return f"{User.objects.get(pk=user_id).get_full_name()} - Send message"
 
 
 class InboxView(CheckUserMixin, generic.ListView):
@@ -56,6 +60,11 @@ class InboxView(CheckUserMixin, generic.ListView):
 
         return messages_with_read_statuses
 
+    def get_context_data(self, **kwargs):
+        context = super(InboxView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Inbox'
+        return context
+
 
 class OutboxView(CheckUserMixin, generic.ListView):
     template_name = 'messaging/outbox.html'
@@ -79,6 +88,11 @@ class OutboxView(CheckUserMixin, generic.ListView):
 
         return messages_with_read_statuses
 
+    def get_context_data(self, **kwargs):
+        context = super(OutboxView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Outbox'
+        return context
+
 
 class BucketView(CheckUserMixin, generic.ListView):
     template_name = 'messaging/bucket.html'
@@ -101,6 +115,11 @@ class BucketView(CheckUserMixin, generic.ListView):
         messages_with_read_statuses = [[message, status] for message, status in zip(messages_list, is_read_list)]
 
         return messages_with_read_statuses
+
+    def get_context_data(self, **kwargs):
+        context = super(BucketView, self).get_context_data(**kwargs)
+        context['page_title'] = 'Bucket'
+        return context
 
 
 class MessageView(UserPassesTestMixin, View):
@@ -135,7 +154,8 @@ class MessageView(UserPassesTestMixin, View):
         return render(request, 'messaging/message.html', {'message': message,
                                                           'is_from_bucket': is_from_bucket,
                                                           'is_deleted': is_deleted,
-                                                          'is_read': is_read})
+                                                          'is_read': is_read,
+                                                          'page_title': f"{message.subject} - Message"})
 
 
 class DeleteMessageView(CheckUserMixin, View):
