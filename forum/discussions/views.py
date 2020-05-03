@@ -104,8 +104,8 @@ class CreateTopicView(CheckUserMixin, View):
 
             return redirect('discussions:forum')
 
-        return render(request, 'discussions/message_create.html', {'topic_form': topic_form,
-                                                                   'post_form': post_form})
+        return render(request, 'discussions/topic_create.html', {'topic_form': topic_form,
+                                                                 'post_form': post_form})
 
 
 class VotePostView(CheckUserMixin, View):
@@ -119,10 +119,7 @@ class VotePostView(CheckUserMixin, View):
         post = get_object_or_404(Post, id=post_id)
 
         if user == post.author:
-            return JsonResponse({
-                'error': "You cannot vote for your own posts",
-                'code': '400'
-            })
+            return HttpResponseNotFound("Bad request")
 
         try:
             post_votes_obj = PostVotes.objects.get(user=request.user, post=post)
@@ -130,10 +127,7 @@ class VotePostView(CheckUserMixin, View):
 
             # in case that the doubled  ajax request was sent somehow
             if previous_vote == vote_value:
-                return JsonResponse({
-                    'error': "Bad request.",
-                    'code': '400'
-                })
+                return HttpResponseNotFound("Bad request")
 
             post_votes_obj.delete()
 
