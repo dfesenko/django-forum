@@ -1,30 +1,42 @@
-<a href="{% url 'core:index' %}">Home</a>
+<!DOCTYPE html>
 
-{% if request.user.is_authenticated %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ page_title }}</title>
+  </head>
+  <body>
 
-    / <a href="{% url 'messaging:inbox' %}">Mails</a>
+    <a href="{% url 'core:index' %}">Home</a>
 
-    <p>Hello, {{ request.user.username }}! </p>
+    {% if request.user.is_authenticated %}
 
-    <a href="{% url 'profiles:user_details' request.user.pk %}">My profile</a> /
-    <a href="{% url 'feed:feed' %}">My feed</a> /
-    <a href="{% url 'registration:logout' %}">Logout</a>
+        / <a href="{% url 'messaging:inbox' %}">Mails</a>
 
-{% else %}
+        <p>Hello, {{ request.user.username }}! </p>
 
-    <p>
-        <a href="{% url 'registration:login' %}">Login</a> / <a href="{% url 'registration:signup' %}">Sign up</a>
-    </p>
+        <a href="{% url 'profiles:user_details' request.user.pk %}">My profile</a> /
+        <a href="{% url 'feed:feed' %}">My feed</a> /
+        <a href="{% url 'registration:logout' %}">Logout</a>
 
-{% endif %}
+    {% else %}
 
-    <p>
-        <a href="{% url 'discussions:forum' %}">Forum</a>
-    </p>
+        <p>
+            <a href="{% url 'registration:login' %}">Login</a> / <a href="{% url 'registration:signup' %}">Sign up</a>
+        </p>
 
-<p></p>
-{% block content %}
-{% endblock %}
+    {% endif %}
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-{% block javascript %}{% endblock %}
+        <p>
+            <a href="{% url 'discussions:forum' %}">Forum</a>
+        </p>
+
+    <p></p>
+    {% block content %}
+    {% endblock %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    {% block javascript %}{% endblock %}
+
+  </body>
+</html>
