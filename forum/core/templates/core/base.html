@@ -10,6 +10,48 @@
   <body>
 
   <div class="container-fluid">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+          <div class="collapse navbar-collapse" id="main-navigation">
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'core:index' %}">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'discussions:forum' %}">Forum</a>
+              </li>
+            </ul>
+              <ul class="navbar-nav ml-auto">
+                  {% if request.user.is_authenticated %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'feed:feed' %}">Feed</a>
+                  </li>
+                 <li class="nav-item navbar-right">
+                    <a class="nav-link" href="{% url 'messaging:inbox' %}">Mails</a>
+                 </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'profiles:user_details' request.user.pk %}">
+                        <img src="{{ request.user.profile.user_avatar.url }}" width="35" height="30">
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'registration:logout' %}">Logout</a>
+                  </li>
+                  {% else %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'registration:login' %}">Login</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'registration:signup' %}">Sign up</a>
+                  </li>
+                  {% endif %}
+            </ul>
+          </div>
+        </nav>
+      </div>
+  </div>
+
+  <div class="container-fluid">
     <a href="{% url 'core:index' %}">Home</a>
 
     {% if request.user.is_authenticated %}
