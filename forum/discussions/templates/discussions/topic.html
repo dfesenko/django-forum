@@ -72,7 +72,7 @@
     <ul>
     {% for post in posts_and_votes_list %}
         <li id="{{ post.0.pk }}">
-            <p>Author: {{ post.0.author.username }}</p>
+            <p>Author: <a href="{% url 'profiles:user_details' pk=post.0.author.pk %}"> {{ post.0.author.username }} </a> </p>
             <img src="{{ post.0.author.profile.user_avatar.url }}" width="35" height="50">
             <p>Date: {{ post.0.creation_date }}</p>
             <p>{{ post.0.post_body }}</p>
