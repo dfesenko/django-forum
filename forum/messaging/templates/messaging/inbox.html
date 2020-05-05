@@ -2,37 +2,53 @@
 
 {% block content %}
 
-<h1>{{ request.user.username }} - Inbox</h1>
-
-<a href="{% url 'messaging:inbox' %}">Inbox</a> /
-<a href="{% url 'messaging:outbox' %}">Outbox</a> /
-<a href="{% url 'messaging:bucket' %}">Bucket</a>
-
-{% if received_messages_list %}
-
-<p>Messages: </p>
-
-    <table>
-    {% for message in received_messages_list %}
-        <tr>
-            <td><a href="{% url 'messaging:message' message_id=message.0.pk %}">{{ message.0.subject }} </a></td>
-            <td>
-                {% if message.1 %} -
-                <a href="{% url 'messaging:read_unread' message_id=message.0.pk read_action='as_unread' %}">
-                        Mark as unread
-                </a>
-                {% else %} -
-                    <a href="{% url 'messaging:read_unread' message_id=message.0.pk read_action='as_read' %}">
-                        Mark as read
-                    </a>
-                {% endif %}
-            </td>
-        </tr>
-    {% endfor %}
-    </table>
-{% else %}
-    <p>Your inbox is empty.</p>
-{% endif %}
-
+<div class="container-fluid">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-6 btn-toolbar mb-4">
+                <a href="{% url 'messaging:inbox' %}" class="btn btn-warning mr-4">Inbox</a>
+                <a href="{% url 'messaging:outbox' %}" class="btn btn-info mr-4">Outbox</a>
+                <a href="{% url 'messaging:bucket' %}" class="btn btn-info">Bucket</a>
+            </div>
+        </div>
+        <div class="row ml-1">
+            {% if received_messages_list %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>From</th>
+                            <th>Subject</th>
+                            <th>Mark as</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for message in received_messages_list %}
+                        <tr>
+                            <td>{{ message.0.sender }}</td>
+                            <td><a href="{% url 'messaging:message' message_id=message.0.pk %}">{{ message.0.subject }} </a></td>
+                            <td>
+                                {% if message.1 %}
+                                <a href="{% url 'messaging:read_unread' message_id=message.0.pk read_action='as_unread' %}">
+                                        Unread
+                                </a>
+                                {% else %}
+                                    <a href="{% url 'messaging:read_unread' message_id=message.0.pk read_action='as_read' %}">
+                                        Read
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td><a href="{% url 'messaging:delete_message' message_id=message.0.pk %}">Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <span><p>Your inbox is empty.</p></span>
+            {% endif %}
+        </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
