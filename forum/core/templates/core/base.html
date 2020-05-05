@@ -11,7 +11,7 @@
 
   <div class="container-fluid">
         <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-            <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+          <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="main-navigation">
@@ -54,8 +54,10 @@
 
 
     <div class="container-fluid">
-        {% block content %}
-        {% endblock %}
+        <div class="row pt-2 pb-2">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

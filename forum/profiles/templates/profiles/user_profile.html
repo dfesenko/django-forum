@@ -2,32 +2,57 @@
 
 {% block content %}
 
-<h1>{{ user.get_full_name }}</h1>
-
-{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
-
-
-{% if request.user.is_authenticated and request.user.pk == user.pk %}
-
-    <a href="{% url 'profiles:edit_profile' %}">Edit profile</a> /
-    <a href="{% url 'registration:password_change' %}">Change password</a>
-
-{% elif request.user.is_authenticated %}
-
-    <a href="{% url 'messaging:message_create' pk=user.pk %}">Send message</a>
-
-{% endif %}
-
-<p>User's posts amount: {{ user.profile.user_posts_amount }}</p>
-<p>Last forum activity at: {{ user.profile.user_last_forum_activity_date }}</p>
-<a href="{% url 'profiles:user_forum_activity' pk=user.pk %}">More info about forum activity</a>
-
-
-<ul>
-    <li>Username: {{ user.username }}</li>
-    <li>City: {{ user.profile.user_location }}</li>
-    <li>About me: {{ user.profile.user_about }}</li>
-    <li>Avatar: <img src="{{ user.profile.user_avatar.url }}" width="100" height="150"> </li>
-</ul>
+<div class="container-fluid">
+    <div class="col-md-12">
+        <div class="row mb-4">
+            {% if request.user.is_authenticated and request.user.pk == user.pk %}
+            <div class="col-md-4 btn-toolbar">
+                <a href="{% url 'profiles:edit_profile' %}" class="btn btn-info mr-4">Edit profile</a>
+                <a href="{% url 'registration:password_change' %}" class="btn btn-warning">Change password</a>
+            </div>
+            {% elif request.user.is_authenticated %}
+            <div class="col-md-4">
+                <a href="{% url 'messaging:message_create' pk=user.pk %}" class="btn btn-info">Send message</a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="row h-100 align-items-center mb-4">
+            <div class="col-md-1">
+                <img src="{{ user.profile.user_avatar.url }}" width="90" height="100">
+            </div>
+            <div class="col-md-5">
+                <h2>{{ user.get_full_name }}</h2>
+            </div>
+        </div>
+        <div class="row">
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2"><i>Username: </i> </div>
+            <div class="col-md-10"><span>{{ user.username }} </span> </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2"><i>City: </i> </div>
+            <div class="col-md-10"><span>{{ user.profile.user_location }} </span> </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2"><i>About me: </i> </div>
+            <div class="col-md-10"><span>{{ user.profile.user_about }} </span> </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-2"><i>User's posts amount: </i> </div>
+            <div class="col-md-10"><span>{{ user.profile.user_posts_amount }} </span> </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-2"><i>Last forum activity at: </i> </div>
+            <div class="col-md-10"><span>{{ user.profile.user_last_forum_activity_date }} </span> </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <a href="{% url 'profiles:user_forum_activity' pk=user.pk %}" class="btn btn-warning">More info about forum activity</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
