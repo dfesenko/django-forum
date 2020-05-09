@@ -1,34 +1,28 @@
 {% extends "core/base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
-<h1>New topic</h1>
 
-<form method="post" action="{% url 'discussions:new_topic'%}" >
+<div class="container-fluid pt-3">
 
-{% csrf_token %}
+    <div class="row">
+        <div class="col-md-12">
+            <h1>New topic</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" action="{% url 'discussions:new_topic'%}" novalidate>
+                {% csrf_token %}
+                {{ topic_form|crispy }}
+                {{ post_form|crispy }}
+                <button type="submit" class="btn btn-success">Add</button>
+            </form>
+        </div>
+    </div>
 
-<table>
-
-    <tr>
-        <td>{{ topic_form.topic_title.label_tag }}</td>
-        <td>{{ topic_form.topic_title}}</td>
-    </tr>
-
-    <tr>
-        <td>{{ topic_form.category.label_tag }}</td>
-        <td>{{ topic_form.category }}</td>
-    </tr>
-
-    <tr>
-        <td>{{ post_form.post_body.label_tag }}</td>
-        <td>{{ post_form.post_body }}</td>
-    </tr>
-
-</table>
-
-<input type="submit" value="Add">
-
-</form>
+</div>
 
 {% endblock %}
