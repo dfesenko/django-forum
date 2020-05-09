@@ -2,22 +2,65 @@
 
 {% block content %}
 
-{% if request.user.is_authenticated %}
-<p>
-    <a href="{% url 'discussions:new_topic' %}">Create new topic</a>
-</p>
-{% endif %}
+<div class="container-fluid pt-3">
+    <div class="row">
+        {% if request.user.is_authenticated %}
+            <div class="col-md-2">
+                <a href="{% url 'discussions:new_topic' %}" class="btn btn-warning">Create new topic</a>
+            </div>
+        {% endif %}
+         <div class="col-md-4">
+            {% if categories_list %}
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select forum category
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                {% for category in categories_list %}
+                    <a class="dropdown-item" href="{% url 'discussions:category' category_id=category.pk %}">
+                        {{ category.category_name }}
+                    </a>
+                 {% endfor %}
+              </div>
+          </div>
+        </div>
+        {% endif %}
+    </div>
 
-{% if categories_list %}
-<p>Categories:</p>
-    <ul>
-    {% for category in categories_list %}
-        <li><a href="{% url 'discussions:category' category_id=category.pk %}">{{ category.category_name }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>There are no categories yet.</p>
-{% endif %}
+    {% if topics_all %}
+    <h3 class="pt-3">All Topics</h3>
+        {% for topic in topics_all %}
+            <div class="row border-top">
+                <div class="col-md-12">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <a href="{% url 'profiles:user_details' pk=topic.author.pk %}">
+                                <img src="{{ topic.author.profile.user_avatar.url }}" width="45" height="50">
+                            </a>
+                            <a href="{% url 'profiles:user_details' pk=topic.author.pk %}"><i>{{ topic.author }}</i></a>
+                        </div>
+                        <div class="col-md-2">
+                            <i>{{ topic.creation_date|date:'j E Y' }}</i>
+                        </div>
+                        <div class="col-md-1">
+                            <i>Posts: {{ topic.posts_amount }}</i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 pt-2">
+                    <div class="row border-bottom">
+                        <div class="col-md-12">
+                            <a class="h5 pl-5" href="{% url 'discussions:topic' topic_id=topic.pk %}">{{ topic.topic_title }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="h4">There are no topics yet.</p>
+    {% endif %}
 
+</div>
 
 {% endblock %}
