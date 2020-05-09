@@ -11,21 +11,21 @@
         {% endif %}
          <div class="col-md-4">
             {% if categories_list %}
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  {% if not category_name %} Select forum category {% else %} {{ category_name }} {% endif %}
-              </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                {% for category in categories_list %}
-                    <a class="dropdown-item" href="{% url 'discussions:category' category_id=category.pk %}">
-                        {{ category.category_name }}
-                    </a>
-                 {% endfor %}
-              </div>
-          </div>
-        </div>
-        {% endif %}
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      {% if not category_name %} Select forum category {% else %} {{ category_name }} {% endif %}
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    {% for category in categories_list %}
+                        <a class="dropdown-item" href="{% url 'discussions:category' category_id=category.pk %}">
+                            {{ category.category_name }}
+                        </a>
+                     {% endfor %}
+                  </div>
+                </div>
+             {% endif %}
+         </div>
     </div>
 
     {% if topics %}
