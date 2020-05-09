@@ -2,36 +2,75 @@
 
 {% block content %}
 
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="col-md-2">
+            {% if is_from_bucket %}
+            <a class="btn btn-primary" href="{% url 'messaging:bucket' %}"> Return to Bucket </a>
+            {% elif request.user == message.receiver%}
+            <a class="btn btn-primary" href="{% url 'messaging:inbox' %}">Return to Inbox</a>
+            {% else %}
+            <a class="btn btn-primary" href="{% url 'messaging:outbox' %}">Return to Outbox</a>
+            {% endif %}
+        </div>
+        <div class="col-md-2">
+            {% if is_read %}
+                <a class="btn btn-warning" href="{% url 'messaging:read_unread' message_id=message.pk read_action='as_unread' %}">
+                    Mark as unread
+                </a>
+            {% else %}
+                <a class="btn btn-warning" href="{% url 'messaging:read_unread' message_id=message.pk read_action='as_read' %}">
+                    Mark as read
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row pt-4">
+        <div class="col-md-2">
+            <span class="text-info">From:
+                <a href="{% url 'profiles:user_details' pk=message.sender.pk %}">
+                    <i>{{message.sender}}</i>
+                </a>
+            </span>
+        </div>
+        <div class="col-md-2">
+            <span class="text-info">To:
+                <a href="{% url 'profiles:user_details' pk=message.receiver.pk %}">
+                    <i>{{message.receiver}}</i>
+                </a>
+            </span>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-4">
+            <span><i>{{message.created_at}}</i></span>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-8">
+            <h5>Subject: {{ message.subject }} </h5>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-8">
+            <p> {{ message.msg_content }} </p>
+        </div>
+    </div>
+    <div class="row pt-3">
+        {% if is_deleted %}
+        <div class="col-md-2">
+            <a class="btn btn-danger" href="{% url 'messaging:delete_message' message_id=message.pk %}">Delete permanently</a>
+        </div>
+        <div class="col-md-2">
+           <a class="btn btn-success" href="{% url 'messaging:restore_message' message_id=message.pk %}"> Restore </a>
+        </div>
+        {% else %}
+        <div class="col-md-2">
+            <a class="btn btn-danger" href="{% url 'messaging:delete_message' message_id=message.pk %}">Delete message</a>
+        </div>
+        {% endif %}
+    </div>
 
-{% if is_from_bucket %}
-<p> Return to <a href="{% url 'messaging:bucket' %}"> Bucket </a> </p>
-{% elif request.user == message.receiver%}
-<p> Return to <a href="{% url 'messaging:inbox' %}"> Inbox </a> </p>
-{% else %}
-<p> Return to <a href="{% url 'messaging:outbox' %}"> Outbox </a> </p>
-{% endif %}
-
-
-{% if is_read %}
-    <a href="{% url 'messaging:read_unread' message_id=message.pk read_action='as_unread' %}">Mark as unread</a>
-{% else %}
-    <a href="{% url 'messaging:read_unread' message_id=message.pk read_action='as_read' %}">Mark as read</a>
-{% endif %}
-
-<p>From: <i>{{message.sender}}</i></p>
-<p>To: <i>{{message.receiver}}</i></p>
-<p>At: <i>{{message.created_at}}</i></p>
-
-<h3>Subject: {{ message.subject }} </h3>
-
-<p> {{ message.msg_content }} </p>
-
-{% if is_deleted %}
-<a href="{% url 'messaging:delete_message' message_id=message.pk %}">Delete permanently</a> /
-<a href="{% url 'messaging:restore_message' message_id=message.pk %}"> Restore </a>
-{% else %}
-<a href="{% url 'messaging:delete_message' message_id=message.pk %}">Delete message</a>
-{% endif %}
-
+</div>
 
 {% endblock %}
