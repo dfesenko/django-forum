@@ -26,9 +26,9 @@
                     {% for message in deleted_messages_list %}
                         <tr>
                             {% if message.0.receiver != user %}
-                                <td>{{ message.0.receiver }}</td>
+                                <td><a href="{% url 'profiles:user_details' pk=message.0.receiver.pk %}">{{ message.0.receiver }}</a></td>
                             {% else %}
-                                <td>{{ message.0.sender }}</td>
+                                <td><a href="{% url 'profiles:user_details' pk=message.0.sender.pk %}">{{ message.0.sender }}</a></td>
                             {% endif %}
                             <td><a href="{% url 'messaging:message' message_id=message.0.pk %}">{{ message.0.subject }} </a></td>
                             <td>

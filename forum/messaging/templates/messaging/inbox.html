@@ -25,7 +25,7 @@
                     <tbody>
                     {% for message in received_messages_list %}
                         <tr>
-                            <td>{{ message.0.sender }}</td>
+                            <td><a href="{% url 'profiles:user_details' pk=message.0.sender.pk %}">{{ message.0.sender }}</a></td>
                             <td><a href="{% url 'messaging:message' message_id=message.0.pk %}">{{ message.0.subject }} </a></td>
                             <td>
                                 {% if message.1 %}
