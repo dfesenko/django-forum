@@ -23,22 +23,16 @@ class ForumView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ForumView, self).get_context_data(**kwargs)
-        context['page_title'] = 'Forum'
-        context['topics_all'] = Topic.objects.all()
-        return context
+        try:
+            context['topics'] = Topic.objects.filter(category_id=self.kwargs['category_id'])
+            category_name = Category.objects.get(pk=self.kwargs['category_id']).category_name
+            context['page_title'] = category_name + " - Forum"
+            context['category_name'] = category_name
+        except KeyError as e:
+            if 'category_id' in str(e):
+                context['topics'] = Topic.objects.all()
+                context['page_title'] = 'Forum'
 
-
-class CategoryView(generic.ListView):
-    template_name = 'discussions/category.html'
-    context_object_name = 'topics_list'
-
-    def get_queryset(self):
-        return Topic.objects.filter(category_id=self.kwargs['category_id'])
-
-    def get_context_data(self, **kwargs):
-        category_name = Category.objects.get(pk=self.kwargs['category_id']).category_name
-        context = super(CategoryView, self).get_context_data(**kwargs)
-        context['page_title'] = category_name
         return context
 
 

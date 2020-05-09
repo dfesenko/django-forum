@@ -14,7 +14,7 @@
             <div class="dropdown">
               <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Select forum category
+                  {% if not category_name %} Select forum category {% else %} {{ category_name }} {% endif %}
               </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                 {% for category in categories_list %}
@@ -28,9 +28,13 @@
         {% endif %}
     </div>
 
-    {% if topics_all %}
-    <h3 class="pt-3">All Topics</h3>
-        {% for topic in topics_all %}
+    {% if topics %}
+        {% if not category_name %}
+            <h3 class="pt-3">All Topics</h3>
+        {% else %}
+            <h3 class="pt-3">{{ category_name }} Topics</h3>
+        {% endif %}
+        {% for topic in topics %}
             <div class="row border-top">
                 <div class="col-md-12">
                     <div class="row align-items-center">
@@ -58,7 +62,7 @@
             </div>
         {% endfor %}
     {% else %}
-        <p class="h4">There are no topics yet.</p>
+        <p class="h4 pt-3">There are no topics yet.</p>
     {% endif %}
 
 </div>
