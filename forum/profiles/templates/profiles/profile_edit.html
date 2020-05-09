@@ -1,53 +1,53 @@
 {% extends "core/base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
-<h1>{{ user.get_full_name }} - Edit profile</h1>
+<div class="container-fluid pt-3">
 
-<form method="post" action="{% url 'profiles:edit_profile' %}" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ user.get_full_name }} - Edit profile</h1>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-6">
+            <form method="post" action="{% url 'profiles:edit_profile' %}" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-6">
+                        {{ user_form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="col-6">
+                        {{ user_form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        {{ user_form.email|as_crispy_field }}
+                    </div>
+                    <div class="col-6">
+                        {{ profile_form.user_location|as_crispy_field }}
+                    </div>
+                </div>
+                {{ profile_form.user_about|as_crispy_field }}
+                <div class="row">
+                    <div class="col-6">
+                        <p>Current avatar:
+                            <img src="{{ user_avatar.url }}" width="90" height="100">
+                        </p>
+                    </div>
+                    <div class="col-6">
+                        {{ profile_form.user_avatar|as_crispy_field }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-warning">Save</button>
+            </form>
+        </div>
+    </div>
 
-{% csrf_token %}
-
-<table>
-<tr>
-    <td>{{ user_form.first_name.label_tag }}</td>
-    <td>{{ user_form.first_name }}</td>
-</tr>
-
-<tr>
-    <td>{{ user_form.last_name.label_tag }}</td>
-    <td>{{ user_form.last_name }}</td>
-</tr>
-
-<tr>
-    <td>{{ user_form.email.label_tag }}</td>
-    <td>{{ user_form.email }}</td>
-</tr>
-
-<tr>
-    <td>{{ profile_form.user_location.label_tag }}</td>
-    <td>{{ profile_form.user_location }}</td>
-</tr>
-
-<tr>
-    <td>{{ profile_form.user_about.label_tag }}</td>
-    <td>{{ profile_form.user_about }}</td>
-</tr>
-
-<tr>
-    <td>{{ profile_form.user_avatar.label_tag }}</td>
-    <td>{{ profile_form.user_avatar }}</td>
-</tr>
-
-</table>
-
-<p>Current avatar:
-    <img src="{{ user_avatar.url }}" width="100" height="150">
-</p>
-
-<input type="submit" value="Save">
-
-</form>
+</div>
 
 
 {% endblock %}
