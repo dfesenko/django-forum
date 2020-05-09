@@ -83,6 +83,7 @@ class TopicView(View):
             'posts_and_votes_list': posts_with_vote_statuses,
             'post_form': post_form,
             'topic_id': topic_id,
+            'topic': Topic.objects.get(pk=topic_id),
             'is_subscribed': is_subscribed,
             'page_title': Topic.objects.get(pk=topic_id).topic_title
         })

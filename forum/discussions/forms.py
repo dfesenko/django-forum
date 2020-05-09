@@ -11,7 +11,7 @@ class TopicForm(ModelForm):
 
 
 class PostForm(ModelForm):
-    post_body = CharField(widget=Textarea({}), label='Text')
+    post_body = CharField(widget=Textarea(attrs={'rows': 5}), label='')
 
     class Meta:
         model = Post

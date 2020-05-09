@@ -1,5 +1,7 @@
 {% extends "core/base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block javascript %}
   <script>
     $(".vote").on("click", function () {
@@ -46,55 +48,91 @@
 
 {% block content %}
 
-{% if not request.user.is_anonymous %}
-    <form method="post" action="{% url 'discussions:topic' topic_id=topic_id %}" >
-        {% csrf_token %}
-        <table>
-            <tr>
-                <td>{{ post_form.post_body.label_tag }}</td>
-                <td>{{ post_form.post_body }}</td>
-            </tr>
-        </table>
-        <input type="submit" value="Add post">
-    </form>
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h3> {{ topic.topic_title }} </h3>
+        </div>
+        <div class="col-md-2">
+            <i> {{ topic.creation_date }} </i>
+        </div>
+        <div class="col-md-2">
+            <i> Posts: {{ topic.posts_amount }} </i>
+        </div>
+    </div>
+    {% if not request.user.is_anonymous %}
+        <div class="row pt-3">
+            <div class="col-md-4">
+                <form method="post" action="{% url 'discussions:topic' topic_id=topic_id %}" novalidate>
+                    {% csrf_token %}
+                    {{ post_form|crispy }}
+                    <button type="submit" class="btn btn-success">Add post</button>
+                </form>
+            </div>
+        </div>
 
-    {% if is_subscribed %}
-        <button class='subscription' value="{{ topic_id }}">Unsubscribe from this topic</button>
-    {% else %}
-        <button class='subscription' value="{{ topic_id }}">Subscribe to this topic</button>
+        <div class="row">
+            <div class="col-md-3 pt-3">
+                <button class='subscription btn btn-secondary' value="{{ topic_id }}">
+                    {% if is_subscribed %}
+                        Unsubscribe from this topic
+                    {% else %}
+                        Subscribe to this topic
+                    {% endif %}
+                </button>
+            </div>
+        </div>
     {% endif %}
+    <div class="row pt-4">
+        <div class="col-md-8">
+            {% if posts_and_votes_list %}
+                {% for post in posts_and_votes_list %}
+                    <div id="{{ post.0.pk }}" class="row border-top pt-2">
+                        <div class="col-md-12">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <img src="{{ post.0.author.profile.user_avatar.url }}" width="45" height="45">
+                                    <a href="{% url 'profiles:user_details' pk=post.0.author.pk %}">{{ post.0.author.username }}</a>
+                                </div>
+                                <div class="col-md-2">
+                                    <i>{{ post.0.creation_date|date:'j E Y H:i' }}</i>
+                                </div>
+                                <div class="col-md-2">
+                                    <span>Votes: <i>{{ post.0.votes }}</i></span>
+                                </div>
+                            </div>
 
-{% endif %}
+                            <div class="row pt-3">
+                                <div class="col-md-12">
+                                    <p>{{ post.0.post_body }}</p>
+                                </div>
+                            </div>
 
-
-{% if posts_and_votes_list %}
-<p>Posts:</p>
-    <ul>
-    {% for post in posts_and_votes_list %}
-        <li id="{{ post.0.pk }}">
-            <p>Author: <a href="{% url 'profiles:user_details' pk=post.0.author.pk %}"> {{ post.0.author.username }} </a> </p>
-            <img src="{{ post.0.author.profile.user_avatar.url }}" width="35" height="50">
-            <p>Date: {{ post.0.creation_date }}</p>
-            <p>{{ post.0.post_body }}</p>
-            <p>Votes: <span>{{ post.0.votes }}</span></p>
-
-            {% if not request.user.is_anonymous and request.user != post.0.author %}
-                {% if post.1 == 0 %}
-                    <button class='vote' value="{{ post.0.pk }}">Like</button>
-                    <button class='vote' value="{{ post.0.pk }}">Dislike</button>
-                {% elif post.1 == 1 %}
-                    <button class='vote' value="{{ post.0.pk }}" style="display: none;">Like</button>
-                    <button class='vote' value="{{ post.0.pk }}">Dislike</button>
-                {% else %}
-                    <button class='vote' value="{{ post.0.pk }}">Like</button>
-                    <button class='vote' value="{{ post.0.pk }}" style="display: none;">Dislike</button>
-                {% endif %}
+                            <div class="row pt-2">
+                                <div class="col-md-12">
+                                    {% if not request.user.is_anonymous and request.user != post.0.author %}
+                                        {% if post.1 == 0 %}
+                                            <button class='vote btn btn-success btn-sm' value="{{ post.0.pk }}">Like</button>
+                                            <button class='vote btn btn-danger btn-sm' value="{{ post.0.pk }}">Dislike</button>
+                                        {% elif post.1 == 1 %}
+                                            <button class='vote btn btn-success btn-sm' value="{{ post.0.pk }}" style="display: none;">Like</button>
+                                            <button class='vote btn btn-danger btn-sm' value="{{ post.0.pk }}">Dislike</button>
+                                        {% else %}
+                                            <button class='vote btn btn-success btn-sm' value="{{ post.0.pk }}">Like</button>
+                                            <button class='vote btn btn-danger btn-sm' value="{{ post.0.pk }}" style="display: none;">Dislike</button>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>There are no posts yet.</p>
             {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>There are no posts yet.</p>
-{% endif %}
+        </div>
+    </div>
+</div>
+
 
 {% endblock %}
