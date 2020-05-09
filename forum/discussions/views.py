@@ -24,6 +24,7 @@ class ForumView(generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ForumView, self).get_context_data(**kwargs)
         context['page_title'] = 'Forum'
+        context['topics_all'] = Topic.objects.all()
         return context
 
 
