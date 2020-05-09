@@ -1,5 +1,7 @@
 {% extends "core/base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
 {% if form.errors %}
@@ -15,23 +17,29 @@
     {% endif %}
 {% endif %}
 
-<form method="post" action="{% url 'registration:login' %}">
-{% csrf_token %}
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
 
-<input type="submit" value="login">
-<input type="hidden" name="next" value="{{ next }}">
-</form>
+<div class="container-fluid pt-3">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Login</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <form method="post" action="{% url 'registration:login' %}" novalidate>
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-success">Login</button>
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+        </div>
+    </div>
+    <div class="row pt-3">
+        <div class="col-md-3">
+            <a class="btn btn-secondary" href="{% url 'registration:password_reset' %}">Forgot password</a>
+        </div>
+    </div>
+</div>
 
-<p><a href="{% url 'registration:password_reset' %}">Forgot password</a></p>
 
 {% endblock %}
