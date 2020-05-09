@@ -1,38 +1,33 @@
 {% extends "core/base.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
-<h1>{{ receiver.username }} - Send message</h1>
+<div class="container-fluid pt-3">
 
-<form method="post" action="{% url 'messaging:message_create' pk=receiver.pk %}" >
+    <div class="row">
+        <div class="col-md-12">
+            <h1>{{ receiver.username }} - Send message</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <form method="post" action="{% url 'messaging:message_create' pk=receiver.pk %}" novalidate>
+                {% csrf_token %}
+                {{ message_form.sender.label_tag.as_hidden }}
+                {{ message_form.sender.as_hidden }}
 
-{% csrf_token %}
+                {{ message_form.receiver.label_tag.as_hidden }}
+                {{ message_form.receiver.as_hidden }}
 
-<table>
+                {{ message_form.subject|as_crispy_field }}
+                {{ message_form.msg_content|as_crispy_field }}
+                <button type="submit" class="btn btn-success">Send</button>
+            </form>
+        </div>
+    </div>
 
-    <tr>
-        <td>{{ message_form.sender.label_tag.as_hidden }}</td>
-        <td>{{ message_form.sender.as_hidden }}</td>
-    </tr>
-
-    <tr>
-        <td>{{ message_form.receiver.label_tag.as_hidden }}</td>
-        <td>{{ message_form.receiver.as_hidden }}</td>
-    </tr>
-
-    <tr>
-        <td>{{ message_form.subject.label_tag }}</td>
-        <td>{{ message_form.subject }}</td>
-    </tr>
-
-    <tr>
-        <td>{{ message_form.msg_content.label_tag }}</td>
-        <td>{{ message_form.msg_content }}</td>
-    </tr>
-</table>
-
-<input type="submit" value="Send">
-
-</form>
+</div>
 
 {% endblock %}
