@@ -2,16 +2,110 @@
 
 {% block content %}
 
-{% if users_list %}
-<p>Users:</p>
-    <ul>
-    {% for user in users_list %}
-        <li><a href="{% url 'profiles:user_details' pk=user.pk %}">{{ user.username }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>There are no users yet.</p>
-{% endif %}
+<div class="container-fluid pt-3">
+
+    <div class="row">
+        <div class="col-md-4">
+            <h5>Latest updated topics</h5>
+                {% if latest_updated_topics_list %}
+                    {% for topic in latest_updated_topics_list %}
+                        <div class="row border pt-3">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <a class="h6" href="{% url 'discussions:topic' topic_id=topic.pk %}">
+                                            {{ topic.topic_title }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row pt-2">
+                                    <div class="col-md-3">
+                                        <i> {{ topic.creation_date|date:'j E Y' }} </i>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <i> Posts: {{ topic.posts_amount }} </i>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <i> Latest update: {{ topic.last_updated_date|date:'j E H:i' }} </i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+        </div>
+        <div class="col-md-4">
+            <h5>New topics</h5>
+                {% if new_topics_list %}
+                    {% for topic in new_topics_list %}
+                        <div class="row border pt-3">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <a class="h6" href="{% url 'discussions:topic' topic_id=topic.pk %}">
+                                            {{ topic.topic_title }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row pt-2">
+                                    <div class="col-md-3">
+                                        <i> {{ topic.creation_date|date:'j E Y' }} </i>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <i> Posts: {{ topic.posts_amount }} </i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+        </div>
+        <div class="col-md-4">
+            <h5>Most popular topics</h5>
+                {% if most_popular_topics_list %}
+                    {% for topic in most_popular_topics_list %}
+                        <div class="row border pt-3">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <a class="h6" href="{% url 'discussions:topic' topic_id=topic.pk %}">
+                                            {{ topic.topic_title }}
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row pt-2">
+                                    <div class="col-md-3">
+                                        <i> {{ topic.creation_date|date:'j E Y' }} </i>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <i> Posts: {{ topic.posts_amount }} </i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+        </div>
+    </div>
+
+    <div class="row pt-5">
+        <div class="col-md-12">
+            {% if request.user.is_superuser %}
+            <h4>Users</h4>
+                {% if users_list %}
+                    {% for user in users_list %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a href="{% url 'profiles:user_details' pk=user.pk %}">{{ user.username }}</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+</div>
 
 
 {% endblock %}
