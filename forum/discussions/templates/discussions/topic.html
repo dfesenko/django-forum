@@ -112,14 +112,14 @@
                                 <div class="col-md-12">
                                     {% if not request.user.is_anonymous and request.user != post.0.author %}
                                         {% if post.1 == 0 %}
-                                            <button class='vote btn btn-success btn-sm' value="{{ post.0.pk }}">Like</button>
-                                            <button class='vote btn btn-danger btn-sm' value="{{ post.0.pk }}">Dislike</button>
+                                            <button class='vote btn btn-outline-success btn-sm' value="{{ post.0.pk }}">Like</button>
+                                            <button class='vote btn btn-outline-danger btn-sm' value="{{ post.0.pk }}">Dislike</button>
                                         {% elif post.1 == 1 %}
-                                            <button class='vote btn btn-success btn-sm' value="{{ post.0.pk }}" style="display: none;">Like</button>
-                                            <button class='vote btn btn-danger btn-sm' value="{{ post.0.pk }}">Dislike</button>
+                                            <button class='vote btn btn-outline-success btn-sm' value="{{ post.0.pk }}" style="display: none;">Like</button>
+                                            <button class='vote btn btn-outline-danger btn-sm' value="{{ post.0.pk }}">Dislike</button>
                                         {% else %}
-                                            <button class='vote btn btn-success btn-sm' value="{{ post.0.pk }}">Like</button>
-                                            <button class='vote btn btn-danger btn-sm' value="{{ post.0.pk }}" style="display: none;">Dislike</button>
+                                            <button class='vote btn btn-outline-success btn-sm' value="{{ post.0.pk }}">Like</button>
+                                            <button class='vote btn btn-outline-danger btn-sm' value="{{ post.0.pk }}" style="display: none;">Dislike</button>
                                         {% endif %}
                                     {% endif %}
                                 </div>
