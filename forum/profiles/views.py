@@ -35,7 +35,9 @@ class UserActivityView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserActivityView, self).get_context_data(**kwargs)
-        context['page_title'] = f"{User.objects.get(pk=int(self.kwargs['pk'])).username} - User's forum activity"
+        username = User.objects.get(pk=int(self.kwargs['pk'])).username
+        context['page_title'] = f"{username} - User's forum activity"
+        context['username'] = username
         return context
 
 
