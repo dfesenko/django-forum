@@ -36,7 +36,7 @@
             <h3 class="pt-3">{{ category_name }} Topics</h3>
         {% endif %}
         {% for topic in topics %}
-            <div class="row border-top">
+            <div class="row border-top pb-2 pt-2">
                 <div class="col-md-12">
                     <div class="row align-items-center">
                         <div class="col-md-2">
@@ -54,7 +54,7 @@
                     </div>
                 </div>
                 <div class="col-md-12 pt-2">
-                    <div class="row border-bottom">
+                    <div class="row">
                         <div class="col-md-12">
                             <a class="h5 pl-5" href="{% url 'discussions:topic' topic_id=topic.pk %}">{{ topic.topic_title }}</a>
                         </div>
