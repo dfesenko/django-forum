@@ -17,6 +17,7 @@
                       {% if not category_name %} Select forum category {% else %} {{ category_name }} {% endif %}
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="{% url 'discussions:forum' %}">All categories</a>
                     {% for category in categories_list %}
                         <a class="dropdown-item" href="{% url 'discussions:category' category_id=category.pk %}">
                             {{ category.category_name }}
