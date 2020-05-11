@@ -41,32 +41,6 @@ class UserSignupView(View):
             user = form.save(commit=False)
             user.is_active = False
             user.save()
-
-            current_site = get_current_site(request)
-            mail_subject = "Activate your forum's account."
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = account_activation_token.make_token(user)
-
-            html_message = render_to_string('registration/account_activation_email.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': uid,
-                'token': token,
-            })
-
-            text_message = render_to_string('registration/account_activation_email.txt', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': uid,
-                'token': token,
-            })
-
-            from_email = 'forum.djangotest@gmail.com'
-            to_email = form.cleaned_data.get('email')
-
-            self.send_async_mail(subject=mail_subject, text_message=text_message, html_message=html_message,
-                                 from_email=from_email, to_email=to_email)
-
             return redirect('registration:email_confirm')
         else:
             return render(request, 'registration/signup.html', {'form': form})
