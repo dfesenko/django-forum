@@ -108,6 +108,8 @@ in subscribing/unsubscribing features.
 - **Bootstrap** is used for providing a basic user interface. **django-crispy-forms** package was used
 to ensure seamless integration between Django and Bootstrap when building web forms.
 
+- There are **tests** for models and views in *discussions* app.
+
 
 
 
