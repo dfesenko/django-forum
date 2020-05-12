@@ -44,11 +44,12 @@ start from the word `EMAIL`).
 9. Create a PostgreSQL database.
 10. Set credentials for the database in the `forum/settings.py` file 
 (inside the `DATABASES` parameter.
-11. Run Celery workers (in a separate Terminal window, but with activated virtual 
+11. Perform migrations: `python manage.py makemigrations`, `python manage.py migrate`.
+12. Run Celery workers (in a separate Terminal window, but with activated virtual 
 environment and from the `django-forum/forum` directory): 
 `celery worker -A forum --loglevel=debug --concurrency=4`.
-12. Run Django server: `python manage.py runserver`.
-13. The application should be available in the browser: `localhost:8000`.
+13. Run Django server: `python manage.py runserver`.
+14. The application should be available in the browser: `localhost:8000`.
 
 
 ## Application structure in more details
