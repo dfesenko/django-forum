@@ -37,8 +37,6 @@ class ForumView(generic.ListView):
 
 
 class TopicView(View):
-    # todo: refactor this using FormView
-
     def get(self, request, topic_id):
         return self.post_list_response(request, PostForm())
 
