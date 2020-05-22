@@ -37,16 +37,15 @@ Go inside the `django-forum` folder: `cd django-forum`.
 4. Install dependencies into the virtual environment: `pip install -r requirements.txt`.
 5. Install Redis:  `sudo apt update`, `sudo apt install redis-server`.
 6. Run Redis  (in a separate Terminal window): `redis-server`.
-7. Go inside the `forum` directory: `cd forum/`.
-8. Set the credentials for your email that you want to use for sending emails for users.
+7. Set the credentials for your email that you want to use for sending emails for users.
 This should be done in the `forum/settings.py` file (find variables that 
 start from the word `EMAIL`).
-9. Create a PostgreSQL database.
-10. Set credentials for the database in the `forum/settings.py` file 
+8. Create a PostgreSQL database.
+9. Set credentials for the database in the `forum/settings.py` file 
 (inside the `DATABASES` parameter.
-11. Perform migrations: `python manage.py makemigrations`, `python manage.py migrate`.
-12. Run Celery workers (in a separate Terminal window, but with activated virtual 
-environment and from the `django-forum/forum` directory): 
+10. Perform migrations: `python manage.py makemigrations`, `python manage.py migrate`.
+11. Run Celery workers (in a separate Terminal window, but with activated virtual 
+environment and from the `django-forum/` directory): 
 `celery worker -A forum --loglevel=debug --concurrency=4`.
 13. Run Django server: `python manage.py runserver`.
 14. The application should be available in the browser: `localhost:8000`.
@@ -79,7 +78,7 @@ to delete them permanently). Messages can be **marked as read or unread** for th
 Messages from the bucket can be **deleted permanently** or **restored**. 
 
 - **Message page** contains information about the particular message: sender, receiver, date, 
-subject, message body. Also, all actions with messages (deleting, restoring, marking as read)
+subject, message body. Also, all actions with messages (deleting, restoring, marking as read, reply)
 can be performed there.
 
 - Each **user's profile page** contains information about the user: first name, last name, username,
@@ -109,11 +108,3 @@ in subscribing/unsubscribing features.
 to ensure seamless integration between Django and Bootstrap when building web forms.
 
 - There are **tests** for models and views in *discussions* app.
-
-
-
-
-
-
-
-
