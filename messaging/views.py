@@ -28,6 +28,8 @@ class MessageSentView(CheckUserMixin, View):
 
         if message_form.is_valid():
             message_form.save()
+            if 'message' in request.META.get('HTTP_REFERER'):
+                return redirect('messaging:inbox')
             return redirect('profiles:user_details', pk=receiver_id)
 
         return render(request, 'messaging/message_create.html', {'message_form': message_form,
