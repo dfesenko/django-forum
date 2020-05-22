@@ -1,1 +1,1 @@
-default_app_config = 'forum.profiles.apps.ProfilesConfig'
+default_app_config = 'profiles.apps.ProfilesConfig'

@@ -1,1 +1,1 @@
-default_app_config = 'forum.registration.apps.RegistrationConfig'
+default_app_config = 'registration.apps.RegistrationConfig'

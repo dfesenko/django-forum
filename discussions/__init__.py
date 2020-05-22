@@ -1,1 +1,1 @@
-default_app_config = 'forum.discussions.apps.DiscussionsConfig'
+default_app_config = 'discussions.apps.DiscussionsConfig'

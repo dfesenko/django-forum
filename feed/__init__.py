@@ -1,1 +1,1 @@
-default_app_config = 'forum.feed.apps.FeedConfig'
+default_app_config = 'feed.apps.FeedConfig'

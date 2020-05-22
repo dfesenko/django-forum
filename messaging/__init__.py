@@ -1,1 +1,1 @@
-default_app_config = 'forum.messaging.apps.MessagingConfig'
+default_app_config = 'messaging.apps.MessagingConfig'
