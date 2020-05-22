@@ -69,6 +69,11 @@
             <a class="btn btn-danger" href="{% url 'messaging:delete_message' message_id=message.pk %}">Delete message</a>
         </div>
         {% endif %}
+        {% if user != message.sender %}
+        <div class="col-md-2">
+            <a class="btn btn-info" href="{% url 'messaging:message_create' pk=message.sender.pk %}">Reply</a>
+        </div>
+        {% endif %}
     </div>
 
 </div>
