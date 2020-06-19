@@ -1,7 +1,7 @@
 # django-forum
 Forum application developed with Django, PostgreSQL, Celery, and Redis
 
-*Note: the app is still in the development stage*
+The application is deployed using Heroku and is available [here](https://dfesenko-forum.herokuapp.com/).
 
 
 ## About
